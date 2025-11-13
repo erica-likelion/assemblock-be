@@ -27,16 +27,11 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private Long kakaoId;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String nickname;
-
-    // email 필드 완전 삭제
 
     @Column(name = "introduction")
     private String introduction;
-    // ... (기존 portfolioUrl, portfolioPdfUrl, profileImageIndex 필드) ...
-    @Column(name = "profile_url")
-    private String profileUrl;
 
     @Column(name = "portfolio_url")
     private String portfolioUrl;
@@ -48,18 +43,14 @@ public class User extends BaseTimeEntity implements UserDetails {
     private Integer profileImageIndex;
 
     @ElementCollection(fetch = FetchType.EAGER)
-// ... (기존 roles 필드) ...
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")
     private List<Role> roles = new ArrayList<>();
 
     @Column(name = "is_profile_complete")
-// ... (기존 isProfileComplete 필드) ...
     private boolean isProfileComplete = false;
 
-    // --- ▽ ERD 필드 추가 ▽ ---
     @Column(name = "user_level")
-// ... (기존 userLevel, reliabilityCnt, reliabilityLevel, isPublishing 필드) ...
     private Integer userLevel;
 
     @Column(name = "reliability_cnt")
@@ -73,17 +64,14 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Builder
     public User(Long kakaoId) {
-// ... (기존 Builder) ...
         this.kakaoId = kakaoId;
         this.isProfileComplete = false;
-        // 기본값 초기화
         this.userLevel = 1;
         this.reliabilityCnt = 0;
         this.reliabilityLevel = new BigDecimal("0.0");
-        this.isPublishing = true; // 기본 공개
+        this.isPublishing = true;
     }
 
-    // 2단계 정보 입력을 위한 업데이트 메서드 (수정됨)
     public void completeProfile(SignupRequestDto dto) {
         this.nickname = dto.getNickname();
         this.roles = new ArrayList<>(dto.getRoles());

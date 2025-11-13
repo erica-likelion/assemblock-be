@@ -8,15 +8,12 @@ import lombok.Getter;
 
 import java.util.List;
 
-// 4. 2단계 정보 입력을 위한 DTO
 @Getter
 public class SignupRequestDto {
 
     @NotBlank(message = "닉네임은 필수입니다.")
     @Size(max = 5, message = "닉네임은 최대 5자까지 가능합니다.")
     private String nickname;
-
-    // email 필드 완전 삭제
 
     @NotNull(message = "역할은 최소 1개 이상 선택해야 합니다.")
     private List<Role> roles;

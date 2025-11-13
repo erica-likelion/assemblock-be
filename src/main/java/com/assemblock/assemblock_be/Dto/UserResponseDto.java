@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 import java.util.List;
 
-// "내 정보 조회"
+// 내 정보 조회
 @Getter
 public class UserResponseDto {
 
