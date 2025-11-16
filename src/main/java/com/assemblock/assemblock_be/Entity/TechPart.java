@@ -5,7 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,8 +24,8 @@ public class TechPart {
     @Column(name = "tech_name", nullable = false, unique = true)
     private TechName techName;
 
-    @ManyToMany(mappedBy = "techParts")
-    private Set<Block> blocks = new HashSet<>();
+    @OneToMany(mappedBy = "techPart")
+    private List<Block> blocks = new ArrayList<>();
 
     public enum TechName {
         Design, FrontEnd, BackEnd

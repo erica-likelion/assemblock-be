@@ -61,17 +61,13 @@ public class Block {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "Block_techparts",
-            joinColumns = @JoinColumn(name = "block_id"),
-            inverseJoinColumns = @JoinColumn(name = "techpart_id")
-    )
-    private Set<TechPart> techParts = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "techpart_id")
+    private TechPart techPart;
 
-    @OneToMany(mappedBy = "proposalBlock")
+    @OneToMany(mappedBy = "proposalBlock", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProposalTarget> proposalTargets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "block", orphanRemoval = true)
+    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardBlock> boardBlocks = new ArrayList<>();
 }
