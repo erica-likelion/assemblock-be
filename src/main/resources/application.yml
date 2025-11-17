@@ -18,12 +18,12 @@ spring:
         format_sql: true
 
 kakao:
-  rest-api-key: b0d3b15531e0eb591b1c7427f9d56f4a
+  rest-api-key: { rest-api}
   redirect-uri: http://localhost:8080/callback
 
 jwt:
   secret-key: LikeLionProjectAssemblockBackend
-  # 액세스 토큰 만료 시간 (예: 30분)
+  # 액세스 토큰 만료 시간
   access-token-expiration-ms: 1800000
-  # 리프레시 토큰 만료 시간 (예: 7일)
+  # 리프레시 토큰 만료 시간
   refresh-token-expiration-ms: 604800000
