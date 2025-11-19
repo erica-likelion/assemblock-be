@@ -125,14 +125,23 @@ public class BoardService {
     }
 
     private BlockResponseDto blockToResponseDto(Block block) {
+        User user = block.getUser();
+
         return BlockResponseDto.builder()
                 .blockId(block.getId())
-                .title(block.getTitle())
-                .description(block.getOnelineSummary())
-                .username(block.getUser().getNickname())
-                .coverImageUrl(block.getResultUrl())
+                .blockTitle(block.getTitle())
+                .onelineSummary(block.getOnelineSummary())
+                .userId(user.getId())
+                .categoryName(block.getCategoryName() != null ? block.getCategoryName().getDbValue() : null)
+                .blockType(block.getBlockType().name())
+                .contributionScore(block.getContributionScore().intValue())
+                .resultUrl(block.getResultUrl())
+                .toolsText(block.getToolsText())
+                .nickname(user.getNickname())
+                .profileUrl(user.getProfileImageUrl())
                 .build();
     }
+
     private BoardDto.BoardDetailResponse boardToDetailResponse(Board board) {
         List<BlockResponseDto> blocksInBoard = boardBlockRepository.findAllByBoard(board)
                 .stream()

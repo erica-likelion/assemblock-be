@@ -1,3 +1,5 @@
+// 로그인 구현 후 수정 필요
+
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BoardDto;
@@ -25,7 +27,7 @@ public class BoardController {
      */
     @GetMapping
     public ResponseEntity<List<BoardDto.BoardSummaryResponse>> getMyBoards(
-            @AuthenticationPrincipal UserDetailsImpl userDetails // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Long userId = userDetails.getUserId();
         List<BoardDto.BoardSummaryResponse> boards = boardService.getMyBoards(userId);
@@ -38,7 +40,7 @@ public class BoardController {
      */
     @PostMapping
     public ResponseEntity<BoardDto.BoardDetailResponse> createBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody BoardDto.BoardCreateRequest requestDto
     ) {
         Long userId = userDetails.getUserId();
@@ -52,7 +54,7 @@ public class BoardController {
      */
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> getBoardDetails(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId
     ) {
         Long userId = userDetails.getUserId();
@@ -66,7 +68,7 @@ public class BoardController {
      */
     @PutMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> updateBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId,
             @RequestBody BoardDto.BoardUpdateRequest requestDto
     ) {
@@ -81,12 +83,12 @@ public class BoardController {
      */
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId
     ) {
         Long userId = userDetails.getUserId();
         boardService.deleteBoard(userId, boardId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -95,7 +97,7 @@ public class BoardController {
      */
     @PostMapping("/{boardId}/blocks")
     public ResponseEntity<Void> addBlockToBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId,
             @RequestBody Map<String, Long> requestBody
     ) {
@@ -111,12 +113,12 @@ public class BoardController {
      */
     @DeleteMapping("/{boardId}/blocks/{blockId}")
     public ResponseEntity<Void> removeBlockFromBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId,
             @PathVariable Long blockId
     ) {
         Long userId = userDetails.getUserId();
         boardService.removeBlockFromBoard(userId, boardId, blockId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 }
