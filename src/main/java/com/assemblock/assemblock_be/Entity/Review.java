@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Reviews",
+@Table(name = "Review",
         indexes = {
                 @Index(name = "idx_reviewed_id", columnList = "reviewed_id"),
                 @Index(name = "idx_project_id", columnList = "project_id")
@@ -40,8 +40,9 @@ public class Review {
             foreignKey = @ForeignKey(name = "FK_Reviews_project_id"))
     private Project project;
 
-    @Column(name = "review", nullable = false, length = 2048)
-    private String review;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "review", nullable = false)
+    private ReviewRating review;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
