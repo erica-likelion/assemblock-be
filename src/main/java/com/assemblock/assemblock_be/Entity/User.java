@@ -5,26 +5,16 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Users",
-        uniqueConstraints = {
-                @UniqueConstraint(name = "uk_email", columnNames = {"email"})
-        }
-)
-
-@DynamicUpdate
+@Table(name = "User")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +27,16 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "profile_url")
-    private String profileImageUrl;
+    @Convert(converter = MemberRoleSetConverter.class)
+    @Column(name = "main_role", nullable = false)
+    private Set<MemberRole> mainRoles = new HashSet<>();
+
+    @Column(name = "introduction")
+    private String introduction;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profile_type", nullable = false)
+    private ProfileType profileType = ProfileType.Type_1;
 
     @Column(name = "portfolio_url")
     private String portfolioUrl;
@@ -46,21 +44,11 @@ public class User {
     @Column(name = "portfolio_pdf_url", length = 2048)
     private String portfolioPdfUrl;
 
-    @Column(name = "introduction")
-    private String introduction;
+    @Column(name = "review_sent_cnt", nullable = false)
+    private Integer reviewSentCnt = 0;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "main_role", nullable = false)
-    private MemberRole mainRole;
-
-    @Column(name = "user_level", nullable = false)
-    private Integer userLevel;
-
-    @Column(name = "reliability_cnt", nullable = false)
-    private Integer reliabilityCnt;
-
-    @Column(name = "reliability_level", nullable = false, precision = 5, scale = 2)
-    private BigDecimal reliabilityLevel;
+    @Column(name = "review_received_cnt", nullable = false)
+    private Integer reviewReceivedCnt = 0;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -73,31 +61,20 @@ public class User {
     @Column(name = "is_publishing", nullable = false)
     private Boolean isPublishing = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<UserTechPart> userTechParts = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Block> blocks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "proposer")
     private List<Proposal> proposals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviewsWritten = new ArrayList<>();
+    @OneToMany(mappedBy = "proposer")
+    private List<ProposalTarget> proposalTargets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "reviewedUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Review> reviewsReceived = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProjectMember> projectMemberships = new ArrayList<>();
-
-    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Project> projectsProposed = new ArrayList<>();
-
-    public void updateProfile(String newNickname, String newPortfolioUrl, String newIntroduction, MemberRole newMainRole, String newProfileImageUrl, String newPortfolioPdfUrl) {
+    public void updateProfile(String newNickname, String newPortfolioUrl, String newIntroduction,
+                              Set<MemberRole> newMainRoles, ProfileType newProfileType, String newPortfolioPdfUrl) {
         if (newNickname != null && !newNickname.isBlank()) {
             this.nickname = newNickname;
         }
@@ -107,14 +84,37 @@ public class User {
         if (newIntroduction != null) {
             this.introduction = newIntroduction;
         }
-        if (newMainRole != null) {
-            this.mainRole = newMainRole;
+        if (newMainRoles != null && !newMainRoles.isEmpty()) {
+            this.mainRoles = newMainRoles;
         }
-        if (newProfileImageUrl != null) {
-            this.profileImageUrl = newProfileImageUrl;
+        if (newProfileType != null) {
+            this.profileType = newProfileType;
         }
         if (newPortfolioPdfUrl != null) {
             this.portfolioPdfUrl = newPortfolioPdfUrl;
+        }
+    }
+
+    @Converter
+    public static class MemberRoleSetConverter implements AttributeConverter<Set<MemberRole>, String> {
+        @Override
+        public String convertToDatabaseColumn(Set<MemberRole> attribute) {
+            if (attribute == null || attribute.isEmpty()) {
+                return "";
+            }
+            return attribute.stream()
+                    .map(MemberRole::name)
+                    .collect(Collectors.joining(","));
+        }
+
+        @Override
+        public Set<MemberRole> convertToEntityAttribute(String dbData) {
+            if (dbData == null || dbData.isBlank()) {
+                return new HashSet<>();
+            }
+            return Arrays.stream(dbData.split(","))
+                    .map(MemberRole::valueOf)
+                    .collect(Collectors.toSet());
         }
     }
 }
