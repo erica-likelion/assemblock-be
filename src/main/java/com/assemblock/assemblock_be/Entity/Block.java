@@ -9,9 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -30,6 +28,10 @@ public class Block {
     @Convert(converter = BlockCategoryName.BlockCategoryNameConverter.class)
     @Column(name = "category_name")
     private BlockCategoryName categoryName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tech_id")
+    private TechPart techPart;
 
     @Column(name = "block_title", nullable = false)
     private String title;
@@ -61,13 +63,9 @@ public class Block {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "techpart_id")
-    private TechPart techPart;
-
-    @OneToMany(mappedBy = "proposalBlock", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "proposalBlock")
     private List<ProposalTarget> proposalTargets = new ArrayList<>();
 
-    @OneToMany(mappedBy = "block", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "block", orphanRemoval = true)
     private List<BoardBlock> boardBlocks = new ArrayList<>();
 }
