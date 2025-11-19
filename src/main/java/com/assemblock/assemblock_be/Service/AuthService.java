@@ -30,9 +30,6 @@ public class AuthService {
     private String kakaoRedirectUri;
 
 
-    /**
-     * 1단계: 카카오 로그인 (신규 유저 시 자동 회원가입)
-     */
     @Transactional
     public AuthResponse kakaoLogin(String authorizationCode) {
 
@@ -63,9 +60,6 @@ public class AuthService {
         );
     }
 
-    /**
-     * 2단계: 추가 정보 입력 (프로필 완성)
-     */
     @Transactional
     public void completeProfile(Long userId, SignupDto requestDto) {
         User user = userRepository.findById(userId)

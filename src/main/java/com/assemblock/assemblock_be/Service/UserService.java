@@ -14,11 +14,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    /**
-     * 내 정보(프로필) 조회
-     * @param userId (JWT 토큰에서 가져온 사용자 ID)
-     * @return UserResponse
-     */
     @Transactional(readOnly = true)
     public UserResponse getMyProfile(Long userId) {
         User user = userRepository.findById(userId)

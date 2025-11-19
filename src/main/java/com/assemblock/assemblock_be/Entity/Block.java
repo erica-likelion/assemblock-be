@@ -6,7 +6,7 @@ import lombok.*;
 
 @Entity
 @Getter
-@Table(name = "Block") // SQL DDL에 맞춰 테이블 이름을 'Block'으로 변경
+@Table(name = "Block")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Block extends BaseTimeEntity {
 

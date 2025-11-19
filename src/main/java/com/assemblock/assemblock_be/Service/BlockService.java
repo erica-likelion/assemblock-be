@@ -25,9 +25,6 @@ public class BlockService {
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
 
-    /**
-     * C: 블록 생성
-     */
     @Transactional
     public Long createBlock(Long userId, BlockDto requestDto) {
         User user = userRepository.findById(userId)
@@ -47,9 +44,6 @@ public class BlockService {
         return block.getId();
     }
 
-    /**
-     * R: 블록 상세 조회
-     */
     @Transactional(readOnly = true)
     public BlockResponse getBlockDetail(Long blockId) {
         Block block = blockRepository.findById(blockId)
@@ -58,9 +52,6 @@ public class BlockService {
         return new BlockResponse(block);
     }
 
-    /**
-     * U: 블록 수정
-     */
     @Transactional
     public void updateBlock(Long userId, Long blockId, BlockDto requestDto) {
         User user = userRepository.findById(userId)
@@ -82,9 +73,6 @@ public class BlockService {
         block.update(requestDto);
     }
 
-    /**
-     * D: 블록 삭제
-     */
     @Transactional
     public void deleteBlock(Long userId, Long blockId) {
         User user = userRepository.findById(userId)
@@ -100,9 +88,6 @@ public class BlockService {
         blockRepository.delete(block);
     }
 
-    /**
-     * R: 블록 목록 조회/검색 (페이징 포함)
-     */
     @Transactional(readOnly = true)
     public BlockPagingResponse<BlockListResponse> getBlockList(
             Optional<Block.BlockCategory> category,
