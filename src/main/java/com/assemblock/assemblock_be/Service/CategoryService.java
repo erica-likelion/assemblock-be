@@ -26,7 +26,7 @@ public class CategoryService {
     public List<CategoryResponseDto> getCategoriesWithTools() {
         List<TechPart> allCategories = techPartRepository.findAll();
         return allCategories.stream().map(category -> {
-            List<Block> blocksInThisCategory = blockRepository.findByTechParts(category);
+            List<Block> blocksInThisCategory = blockRepository.findByTechPart(category);
             List<SubCategoryDto> subCategories = blocksInThisCategory.stream()
                     .map(Block::getCategoryName)
                     .filter(Objects::nonNull)
@@ -50,10 +50,10 @@ public class CategoryService {
         return blocks.stream()
                 .map(block -> BlockResponseDto.builder()
                         .blockId(block.getId())
-                        .title(block.getTitle())
-                        .description(block.getOnelineSummary())
-                        .username(block.getUser().getNickname())
-                        .coverImageUrl(block.getResultUrl())
+                        .blockTitle(block.getTitle())
+                        .onelineSummary(block.getOnelineSummary())
+                        .nickname(block.getUser().getNickname())
+                        .resultUrl(block.getResultUrl())
                         .build())
                 .collect(Collectors.toList());
     }

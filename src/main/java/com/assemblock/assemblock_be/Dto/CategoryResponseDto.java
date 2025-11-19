@@ -6,13 +6,13 @@ import java.util.List;
 
 @Getter
 public class CategoryResponseDto {
-    private Long categoryId;
-    private String categoryName;
+    private Long techId;
+    private String techName;
     private List<SubCategoryDto> subCategories;
 
-    public CategoryResponseDto(TechPart category, List<SubCategoryDto> subCategories) {
-        this.categoryId = category.getId();
-        this.categoryName = category.getTechName().name();
+    public CategoryResponseDto(TechPart techPart, List<SubCategoryDto> subCategories) {
+        this.techId = techPart.getId();
+        this.techName = techPart.getTechName().name();
         this.subCategories = subCategories;
     }
 }

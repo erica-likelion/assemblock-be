@@ -6,5 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SubCategoryDto {
-    private String name;
+    private String categoryName;
 }
