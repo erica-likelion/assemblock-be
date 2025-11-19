@@ -5,17 +5,26 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Users")
+@Table(name = "Users",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_email", columnNames = {"email"})
+        }
+)
+
+@DynamicUpdate
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +42,16 @@ public class User {
 
     @Column(name = "portfolio_url")
     private String portfolioUrl;
+
+    @Column(name = "portfolio_pdf_url", length = 2048)
+    private String portfolioPdfUrl;
+
+    @Column(name = "introduction")
+    private String introduction;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "main_role", nullable = false)
+    private MemberRole mainRole;
 
     @Column(name = "user_level", nullable = false)
     private Integer userLevel;
@@ -54,27 +73,29 @@ public class User {
     @Column(name = "is_publishing", nullable = false)
     private Boolean isPublishing = true;
 
-    @Column(name = "introduction")
-    private String introduction;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserTechPart> userTechParts = new HashSet<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "main_role", nullable = false)
-    private MemberRole mainRole;
-
-    @Column(name = "portfolio_pdf_url", length = 2048)
-    private String portfolioPdfUrl;
-
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Block> blocks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "proposer")
+    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Proposal> proposals = new ArrayList<>();
 
-    @OneToMany(mappedBy = "proposer")
-    private List<ProposalTarget> proposalTargets = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewsWritten = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    @OneToMany(mappedBy = "reviewedUser", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Review> reviewsReceived = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectMember> projectMemberships = new ArrayList<>();
+
+    @OneToMany(mappedBy = "proposer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Project> projectsProposed = new ArrayList<>();
 
     public void updateProfile(String newNickname, String newPortfolioUrl, String newIntroduction, MemberRole newMainRole, String newProfileImageUrl, String newPortfolioPdfUrl) {
         if (newNickname != null && !newNickname.isBlank()) {

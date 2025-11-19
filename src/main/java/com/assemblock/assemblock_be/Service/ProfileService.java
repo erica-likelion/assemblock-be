@@ -1,13 +1,17 @@
+// ProjectMemberRepository와 ReviewRepository 파일 확인 필요
+
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
 import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Entity.TechPart.TechName;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
+import com.assemblock.assemblock_be.Repository.UserRepository;
 import com.assemblock.assemblock_be.Repository.ProjectMemberRepository;
 import com.assemblock.assemblock_be.Repository.ReviewRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Repository.UserTechPartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +28,8 @@ public class ProfileService {
     private final BlockRepository blockRepository;
     private final ReviewRepository reviewRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final TechPartService techPartService;
+    private final UserTechPartRepository userTechPartRepository;
 
     public MyProfileResponseDto getPublicProfile(Long userId) {
         User user = findPublicUserById(userId);
@@ -45,13 +51,7 @@ public class ProfileService {
         }
 
         return blocks.stream()
-                .map(block -> BlockResponseDto.builder()
-                        .blockId(block.getId())
-                        .title(block.getTitle())
-                        .description(block.getOnelineSummary())
-                        .username(block.getUser().getNickname())
-                        .coverImageUrl(block.getResultUrl())
-                        .build())
+                .map(this::blockToResponseDto)
                 .collect(Collectors.toList());
     }
 
@@ -67,23 +67,27 @@ public class ProfileService {
         }
 
         return reviewsToProcess.stream()
-                .map(review -> {
-                    Project project = review.getProject();
-                    Optional<ProjectMember> userRoleInProjectOpt = projectMemberRepository.findByProjectAndUser(
-                            project, user
-                    );
-                    if (userRoleInProjectOpt.isEmpty()) {
-                        return null;
-                    }
-
-                    ProjectMember userRole = userRoleInProjectOpt.get();
-                    boolean isProposer = userRole.getIsProposer();
-                    String roleName = isProposer ? "크리에이터" : "워크스페이스";
-
-                    return ReviewResponseDto.fromEntity(review, roleName);
-                })
+                .map(review -> mapReviewToResponse(review, user))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateUserTechParts(Long userId, List<String> techNames) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        userTechPartRepository.deleteAllByUser(user);
+        for (String name : techNames) {
+            TechName techEnum = TechName.valueOf(name.toUpperCase());
+            TechPart techPart = techPartService.findTechPartByEnum(techEnum);
+
+            UserTechPart userTechPart = UserTechPart.builder()
+                    .user(user)
+                    .techPart(techPart)
+                    .build();
+            userTechPartRepository.save(userTechPart);
+        }
     }
 
     private User findPublicUserById(Long userId) {
@@ -94,5 +98,38 @@ public class ProfileService {
             throw new IllegalArgumentException("비공개 프로필입니다.");
         }
         return user;
+    }
+
+    private BlockResponseDto blockToResponseDto(Block block) {
+        User user = block.getUser();
+
+        return BlockResponseDto.builder()
+                .blockId(block.getId())
+                .blockTitle(block.getTitle())
+                .onelineSummary(block.getOnelineSummary())
+                .userId(user.getId())
+                .categoryName(block.getCategoryName() != null ? block.getCategoryName().getDbValue() : null)
+                .blockType(block.getBlockType().name())
+                .contributionScore(block.getContributionScore().intValue())
+                .resultUrl(block.getResultUrl())
+                .toolsText(block.getToolsText())
+                .nickname(user.getNickname())
+                .profileUrl(user.getProfileImageUrl())
+                .build();
+    }
+
+    private ReviewResponseDto mapReviewToResponse(Review review, User user) {
+        Project project = review.getProject();
+        Optional<ProjectMember> userRoleInProjectOpt = projectMemberRepository.findByProjectAndUser(
+                project, user
+        );
+        if (userRoleInProjectOpt.isEmpty()) {
+            return null;
+        }
+
+        ProjectMember userRole = userRoleInProjectOpt.get();
+        boolean isProposer = userRole.getIsProposer();
+        String roleName = isProposer ? "크리에이터" : "워크스페이스";
+        return ReviewResponseDto.fromEntity(review, roleName);
     }
 }

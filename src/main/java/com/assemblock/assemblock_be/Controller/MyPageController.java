@@ -1,3 +1,5 @@
+// 로그인 구현 후 수정 필요
+
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
@@ -27,7 +29,7 @@ public class MyPageController {
      */
     @GetMapping("/profile")
     public ResponseEntity<MyProfileResponseDto> getMyProfile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Long currentUserId = userDetails.getUserId();
         MyProfileResponseDto responseDto = myPageService.getMyProfile(currentUserId);
@@ -40,7 +42,7 @@ public class MyPageController {
      */
     @PutMapping("/profile")
     public ResponseEntity<MyProfileResponseDto> updateMyProfile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
         Long currentUserId = userDetails.getUserId();
@@ -54,7 +56,7 @@ public class MyPageController {
      */
     @GetMapping("/blocks")
     public ResponseEntity<List<BlockResponseDto>> getMyBlocks(
-            @AuthenticationPrincipal UserDetailsImpl userDetails, // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @RequestParam(defaultValue = "ALL") String type
     ) {
         Long currentUserId = userDetails.getUserId();

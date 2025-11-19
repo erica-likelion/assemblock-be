@@ -12,6 +12,6 @@ public class ProfileUpdateRequestDto {
     private String portfolioUrl;
     private String introduction;
     private String mainRole;
-    private String profileImageUrl;
+    private String profileUrl;
     private String portfolioPdfUrl;
 }
