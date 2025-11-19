@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Blocks")
+@Table(name = "Block")
 public class Block {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +29,12 @@ public class Block {
     @Column(name = "category_name")
     private BlockCategoryName categoryName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tech_id")
+    public enum TechPart {
+        Design, FrontEnd, BackEnd
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tech_part")
     private TechPart techPart;
 
     @Column(name = "block_title", nullable = false)
