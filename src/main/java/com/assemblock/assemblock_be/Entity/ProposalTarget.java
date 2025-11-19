@@ -1,37 +1,29 @@
 package com.assemblock.assemblock_be.Entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Proposal_targets",
-        indexes = {
-                @Index(name = "idx_proposalblock_id", columnList = "proposalblock_id")
-        }
-)
-
-@DynamicUpdate
+@NoArgsConstructor
+@Table(name = "Proposal_target")
+@IdClass(ProposalTargetId.class)
 public class ProposalTarget {
-    @EmbeddedId
-    private ProposalTargetId id;
-
-    @MapsId("proposal")
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_ProposalTargets_proposal_id"))
+    @JoinColumn(name = "proposal_id", nullable = false)
     private Proposal proposal;
 
-    @MapsId("proposalBlock")
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposalblock_id", nullable = false,
-            foreignKey = @ForeignKey(name = "FK_ProposalTargets_proposalblock_id"))
+    @JoinColumn(name = "proposalblock_id", nullable = false)
     private Block proposalBlock;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposer_id", nullable = false)
+    private User proposer;
 
     @Setter
     @Enumerated(EnumType.STRING)

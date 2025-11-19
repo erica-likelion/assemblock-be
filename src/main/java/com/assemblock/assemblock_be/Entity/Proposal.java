@@ -14,7 +14,7 @@ import java.util.ArrayList;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Proposals")
+@Table(name = "Proposal")
 public class Proposal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
