@@ -34,10 +34,6 @@ public class Proposal {
     @Column(name = "recruit_end_date", nullable = false)
     private LocalDate recruitEndDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "recruit_status", nullable = false)
-    private ProposalRecruitStatus recruitStatus = ProposalRecruitStatus.pending;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
