@@ -1,3 +1,5 @@
+// 로그인 구현 후 수정 필요
+
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.NotificationResponseDto;
@@ -10,8 +12,8 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal; // 카카오로그인 구현 후 수정
-import com.assemblock.assemblock_be.security.UserDetailsImpl; // 카카오로그인 구현 후 수정
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.assemblock.assemblock_be.security.UserDetailsImpl;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class NotificationController {
      */
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> getMyNotifications(
-            @AuthenticationPrincipal UserDetailsImpl userDetails // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Long currentUserId = userDetails.getUserId();
         List<NotificationResponseDto> notifications = notificationService.getPendingNotifications(currentUserId);
@@ -38,18 +40,18 @@ public class NotificationController {
     @PostMapping("/{proposalId}/accept")
     public ResponseEntity<Void> acceptNotification(
             @PathVariable Long proposalId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Long currentUserId = userDetails.getUserId();
         try {
             notificationService.acceptProposal(currentUserId, proposalId);
             return ResponseEntity.ok().build();
         } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409 (이미 처리됨)
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 
@@ -60,18 +62,18 @@ public class NotificationController {
     @PostMapping("/{proposalId}/reject")
     public ResponseEntity<Void> rejectNotification(
             @PathVariable Long proposalId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails // 카카오로그인 구현 후 수정
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         Long currentUserId = userDetails.getUserId();
         try {
             notificationService.rejectProposal(currentUserId, proposalId);
             return ResponseEntity.ok().build();
         } catch (AccessDeniedException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 

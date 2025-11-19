@@ -7,14 +7,14 @@ import lombok.Getter;
 public class NotificationResponseDto {
     private Long proposalId;
     private String senderName;
-    private String senderProfileImageUrl;
+    private String senderProfileUrl;
     private String content;
 
     @Builder
-    public NotificationResponseDto(Long proposalId, String senderName, String senderProfileImageUrl, String content) {
+    public NotificationResponseDto(Long proposalId, String senderName, String senderProfileUrl, String content) {
         this.proposalId = proposalId;
         this.senderName = senderName;
-        this.senderProfileImageUrl = senderProfileImageUrl;
+        this.senderProfileUrl = senderProfileUrl;
         this.content = content;
     }
 }

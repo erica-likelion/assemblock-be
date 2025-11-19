@@ -1,3 +1,5 @@
+// ProposalTargetRepository 파일 확인 필요
+
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.NotificationResponseDto;
@@ -27,7 +29,9 @@ public class NotificationService {
         if (myBlocks.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ProposalTarget> targets = proposalTargetRepository.findByProposalBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+
+        List<ProposalTarget> targets = proposalTargetRepository.findByProposalblockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+
         return targets.stream()
                 .map(ProposalTarget::getProposal)
                 .distinct()
@@ -38,7 +42,7 @@ public class NotificationService {
                     return NotificationResponseDto.builder()
                             .proposalId(proposal.getId())
                             .senderName(sender.getNickname())
-                            .senderProfileImageUrl(sender.getProfileImageUrl())
+                            .senderProfileUrl(sender.getProfileImageUrl())
                             .content(content)
                             .build();
                 })
@@ -57,7 +61,6 @@ public class NotificationService {
 
     private void updateProposalTargetsStatus(Long currentUserId, Long proposalId, ProposalStatus newStatus)
             throws AccessDeniedException {
-
         List<ProposalTarget> targets = proposalTargetRepository.findByProposalId(proposalId);
 
         if (targets.isEmpty()) {
@@ -66,6 +69,7 @@ public class NotificationService {
 
         for (ProposalTarget target : targets) {
             Long blockOwnerId = target.getProposalBlock().getUser().getId();
+
             if (!blockOwnerId.equals(currentUserId)) {
                 throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");
             }
