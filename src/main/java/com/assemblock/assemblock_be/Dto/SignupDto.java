@@ -1,6 +1,7 @@
 package com.assemblock.assemblock_be.Dto;
 
 import com.assemblock.assemblock_be.Entity.Role;
+import com.assemblock.assemblock_be.Entity.UserProfileType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -16,10 +17,10 @@ public class SignupDto {
     private String nickname;
 
     @NotNull(message = "역할은 최소 1개 이상 선택해야 합니다.")
-    private List<Role> roles;
+    private Role roles;
 
     @NotNull(message = "프로필 이미지를 선택해야 합니다.")
-    private Integer profileImageIndex;
+    private UserProfileType userProfileType;
 
     @Size(max = 36, message = "한줄 소개는 최대 36자까지 가능합니다.")
     private String introduction;

@@ -37,7 +37,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // '/api/v1/auth/**' 경로는 모두 허용 (로그인, 회원가입, 토큰 재발급)
-                        .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         // 나머지 모든 요청 인증 필요
                         .anyRequest().authenticated()
                 )
