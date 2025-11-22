@@ -117,4 +117,12 @@ public class User {
                     .collect(Collectors.toSet());
         }
     }
+
+    public void increaseReviewSentCnt() {
+        this.reviewSentCnt++;
+    }
+
+    public void increaseReviewReceivedCnt() {
+        this.reviewReceivedCnt++;
+    }
 }
