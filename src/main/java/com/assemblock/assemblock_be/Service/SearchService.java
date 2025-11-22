@@ -3,10 +3,11 @@ package com.assemblock.assemblock_be.Service;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.SearchDto;
 import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.BlockCategoryName;
-import com.assemblock.assemblock_be.Entity.TechPart.TechName;
+import com.assemblock.assemblock_be.Entity.SearchHistory;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
+import com.assemblock.assemblock_be.Repository.SearchHistoryRepository;
+import com.assemblock.assemblock_be.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,54 +21,55 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class SearchService {
     private final BlockRepository blockRepository;
+    private final SearchHistoryRepository searchHistoryRepository;
+    private final UserRepository userRepository;
 
-    public List<BlockResponseDto> searchBlocks(SearchDto searchDto) {
-        String keyword = searchDto.getKeyword();
-        String categoryName = searchDto.getCategoryName();
-        String techPart = searchDto.getTechPart();
-
-        if ((keyword == null || keyword.isBlank()) && (categoryName == null || categoryName.isBlank()) && (techPart == null || techPart.isBlank())) {
+    @Transactional
+    public List<BlockResponseDto> searchBlocks(Long userId, String keyword) {
+        if (keyword == null || keyword.isBlank()) {
             return Collections.emptyList();
         }
 
-        BlockCategoryName categoryEnum = null;
-        if (categoryName != null && !categoryName.isBlank()) {
-            try {
-                categoryEnum = BlockCategoryName.valueOf(categoryName.toUpperCase());
-            } catch (IllegalArgumentException e) {
-            }
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        TechName techEnum = null;
-        if (techPart != null && !techPart.isBlank()) {
-            try {
-                techEnum = TechName.valueOf(techPart.toUpperCase());
-            } catch (IllegalArgumentException e) {
-            }
-        }
+        searchHistoryRepository.save(SearchHistory.builder()
+                .user(user)
+                .keyword(keyword)
+                .build());
 
-        List<Block> blocks = blockRepository.findBySearchCriteria(keyword, categoryEnum, techEnum);
+        List<Block> blocks = blockRepository.findByKeyword(keyword);
 
         return blocks.stream()
-                .map(this::blockToResponseDto)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    private BlockResponseDto blockToResponseDto(Block block) {
-        User user = block.getUser();
+    public List<SearchDto.SearchHistoryResponse> getSearchHistory(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        return BlockResponseDto.builder()
-                .blockId(block.getId())
-                .blockTitle(block.getTitle())
-                .onelineSummary(block.getOnelineSummary())
-                .userId(user.getId())
-                .categoryName(block.getCategoryName() != null ? block.getCategoryName().getDbValue() : null)
-                .blockType(block.getBlockType().name())
-                .contributionScore(block.getContributionScore().intValue())
-                .resultUrl(block.getResultUrl())
-                .toolsText(block.getToolsText())
-                .nickname(user.getNickname())
-                .profileUrl(user.getProfileImageUrl())
-                .build();
+        return searchHistoryRepository.findAllByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .limit(10)
+                .map(history -> SearchDto.SearchHistoryResponse.builder()
+                        .historyId(history.getId())
+                        .keyword(history.getKeyword())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteAllSearchHistory(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        searchHistoryRepository.deleteByUser(user);
+    }
+
+    @Transactional
+    public void deleteSearchHistoryItem(Long userId, Long historyId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        searchHistoryRepository.deleteByIdAndUser(historyId, user);
     }
 }
