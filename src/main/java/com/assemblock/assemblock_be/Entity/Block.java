@@ -1,9 +1,7 @@
 package com.assemblock.assemblock_be.Entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -14,6 +12,8 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Table(name = "Block")
 public class Block {
     @Id
@@ -67,9 +67,11 @@ public class Block {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "proposalBlock")
     private List<ProposalTarget> proposalTargets = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "block", orphanRemoval = true)
     private List<BoardBlock> boardBlocks = new ArrayList<>();
 }
