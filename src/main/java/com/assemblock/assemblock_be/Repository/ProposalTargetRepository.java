@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ProposalTargetRepository extends JpaRepository<ProposalTarget, ProposalTargetId> {
-    List<ProposalTarget> findByProposalBlockInAndResponseStatus(List<Block> proposalBlock, ProposalStatus responseStatus);
+    List<ProposalTarget> findAllByProposalBlockInAndResponseStatus(List<Block> proposalBlocks, ProposalStatus responseStatus);
     long countByProposal(Proposal proposal);
-    List<ProposalTarget> findByProposalId(Long proposalId);
+    List<ProposalTarget> findAllByProposalId(Long proposalId);
 }

@@ -1,13 +1,13 @@
 package com.assemblock.assemblock_be.Entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "Proposal_target")
 @IdClass(ProposalTargetId.class)
 public class ProposalTarget {
@@ -26,6 +26,7 @@ public class ProposalTarget {
     private User proposer;
 
     @Setter
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "response_status", nullable = false)
     private ProposalStatus responseStatus = ProposalStatus.pending;
