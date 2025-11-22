@@ -1,5 +1,3 @@
-// ProposalTargetRepository 파일 확인 필요
-
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.NotificationResponseDto;
@@ -24,13 +22,15 @@ public class NotificationService {
     private final ProposalTargetRepository proposalTargetRepository;
 
     public List<NotificationResponseDto> getPendingNotifications(Long currentUserId) {
-        User user = userRepository.findById(currentUserId).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        List<Block> myBlocks = blockRepository.findByUser(user);
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        List<Block> myBlocks = blockRepository.findAllByUser(user);
         if (myBlocks.isEmpty()) {
             return Collections.emptyList();
         }
 
-        List<ProposalTarget> targets = proposalTargetRepository.findByProposalblockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
 
         return targets.stream()
                 .map(ProposalTarget::getProposal)
@@ -39,10 +39,11 @@ public class NotificationService {
                     User sender = proposal.getProposer();
                     long blockCount = proposalTargetRepository.countByProposal(proposal);
                     String content = proposal.getProjectTitle() + " (" + blockCount + "개 블록 제안)";
+
                     return NotificationResponseDto.builder()
                             .proposalId(proposal.getId())
                             .senderName(sender.getNickname())
-                            .senderProfileUrl(sender.getProfileImageUrl())
+                            .senderProfileType(sender.getProfileType()) // DTO 필드 변경 반영
                             .content(content)
                             .build();
                 })
@@ -61,7 +62,8 @@ public class NotificationService {
 
     private void updateProposalTargetsStatus(Long currentUserId, Long proposalId, ProposalStatus newStatus)
             throws AccessDeniedException {
-        List<ProposalTarget> targets = proposalTargetRepository.findByProposalId(proposalId);
+
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalId(proposalId);
 
         if (targets.isEmpty()) {
             throw new IllegalArgumentException("제안을 찾을 수 없습니다.");
@@ -69,7 +71,6 @@ public class NotificationService {
 
         for (ProposalTarget target : targets) {
             Long blockOwnerId = target.getProposalBlock().getUser().getId();
-
             if (!blockOwnerId.equals(currentUserId)) {
                 throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");
             }
