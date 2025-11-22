@@ -2,18 +2,14 @@ package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.BoardDto;
-import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.Board;
-import com.assemblock.assemblock_be.Entity.BoardBlock;
-import com.assemblock.assemblock_be.Entity.User;
-import com.assemblock.assemblock_be.Repository.BlockRepository;
-import com.assemblock.assemblock_be.Repository.BoardBlockRepository;
-import com.assemblock.assemblock_be.Repository.BoardRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +21,8 @@ public class BoardService {
     private final BoardBlockRepository boardBlockRepository;
     private final UserRepository userRepository;
     private final BlockRepository blockRepository;
+    private final ProposalRepository proposalRepository;
+    private final ProposalTargetRepository proposalTargetRepository;
 
     public List<BoardDto.BoardSummaryResponse> getMyBoards(Long userId) {
         User user = findUserById(userId);
@@ -32,16 +30,17 @@ public class BoardService {
         return boards.stream()
                 .map(board -> {
                     long blockCount = boardBlockRepository.countByBoard(board);
-                    List<String> previewImages = boardBlockRepository.findTop4ByBoardOrderByCreatedAtDesc(board)
+                    List<String> previewTypes = boardBlockRepository.findTop4ByBoardOrderByCreatedAtDesc(board)
                             .stream()
-                            .map(boardBlock -> boardBlock.getBlock().getResultUrl())
+                            .map(boardBlock -> boardBlock.getBlock().getTechPart() != null ?
+                                    boardBlock.getBlock().getTechPart().name() : "IDEA")
                             .collect(Collectors.toList());
 
                     return BoardDto.BoardSummaryResponse.builder()
                             .boardId(board.getId())
                             .boardName(board.getBoardName())
                             .blockCount((int) blockCount)
-                            .previewImageUrls(previewImages)
+                            .previewTypes(previewTypes)
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -71,9 +70,10 @@ public class BoardService {
     public BoardDto.BoardDetailResponse updateBoard(Long userId, Long boardId, BoardDto.BoardUpdateRequest requestDto) {
         User user = findUserById(userId);
         Board board = findBoardByIdAndUser(userId, boardId);
+
         if (!board.getBoardName().equals(requestDto.getBoardName()) &&
                 boardRepository.existsByUserAndBoardName(user, requestDto.getBoardName())) {
-            throw new IllegalArgumentException("이미 사용 중인 보드 이름입니다.");
+            throw new IllegalStateException("이미 사용 중인 보드 이름입니다.");
         }
         board.update(requestDto.getBoardName(), requestDto.getBoardMemo());
         return boardToDetailResponse(board);
@@ -100,12 +100,50 @@ public class BoardService {
     }
 
     @Transactional
-    public void removeBlockFromBoard(Long userId, Long boardId, Long blockId) {
+    public void removeBlocksFromBoard(Long userId, Long boardId, List<Long> blockIds) {
         Board board = findBoardByIdAndUser(userId, boardId);
-        Block block = findBlockById(blockId);
-        BoardBlock boardBlock = boardBlockRepository.findByBoardAndBlock(board, block)
-                .orElseThrow(() -> new IllegalArgumentException("보드에 해당 블록이 존재하지 않습니다."));
-        boardBlockRepository.delete(boardBlock);
+        List<Block> blocks = blockRepository.findAllById(blockIds);
+
+        if (blocks.isEmpty()) {
+            throw new IllegalArgumentException("삭제할 블록이 선택되지 않았거나 존재하지 않습니다.");
+        }
+
+        boardBlockRepository.deleteByBoardAndBlockIn(board, blocks);
+    }
+
+    @Transactional
+    public void createTeamProposal(Long userId, BoardDto.TeamProposalRequest requestDto) {
+        User proposer = findUserById(userId);
+
+        String[] dates = requestDto.getRecruitingPeriod().split("~");
+        if (dates.length != 2) {
+            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다.");
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        LocalDate startDate = LocalDate.parse(dates[0].trim(), formatter);
+        LocalDate endDate = LocalDate.parse(dates[1].trim(), formatter);
+
+        Proposal proposal = Proposal.builder()
+                .proposer(proposer)
+                .projectTitle(requestDto.getProjectTitle())
+                .projectMemo(requestDto.getMemo())
+                .discordId(requestDto.getContact())
+                .recruitStartDate(startDate)
+                .recruitEndDate(endDate)
+                .build();
+        proposalRepository.save(proposal);
+
+        List<Block> targetBlocks = blockRepository.findAllById(requestDto.getTargetBlockIds());
+        for (Block block : targetBlocks) {
+            ProposalTarget target = ProposalTarget.builder()
+                    .proposal(proposal)
+                    .proposalBlock(block)
+                    .proposer(proposer)
+                    .responseStatus(ProposalStatus.pending)
+                    .build();
+            proposalTargetRepository.save(target);
+        }
     }
 
     private User findUserById(Long userId) {
@@ -124,29 +162,11 @@ public class BoardService {
                 .orElseThrow(() -> new IllegalArgumentException("보드를 찾을 수 없거나 접근 권한이 없습니다."));
     }
 
-    private BlockResponseDto blockToResponseDto(Block block) {
-        User user = block.getUser();
-
-        return BlockResponseDto.builder()
-                .blockId(block.getId())
-                .blockTitle(block.getTitle())
-                .onelineSummary(block.getOnelineSummary())
-                .userId(user.getId())
-                .categoryName(block.getCategoryName() != null ? block.getCategoryName().getDbValue() : null)
-                .blockType(block.getBlockType().name())
-                .contributionScore(block.getContributionScore().intValue())
-                .resultUrl(block.getResultUrl())
-                .toolsText(block.getToolsText())
-                .nickname(user.getNickname())
-                .profileUrl(user.getProfileImageUrl())
-                .build();
-    }
-
     private BoardDto.BoardDetailResponse boardToDetailResponse(Board board) {
         List<BlockResponseDto> blocksInBoard = boardBlockRepository.findAllByBoard(board)
                 .stream()
                 .map(BoardBlock::getBlock)
-                .map(this::blockToResponseDto)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
 
         return BoardDto.BoardDetailResponse.builder()
@@ -157,3 +177,4 @@ public class BoardService {
                 .build();
     }
 }
+

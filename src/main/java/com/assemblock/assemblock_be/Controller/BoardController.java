@@ -1,16 +1,15 @@
-// 로그인 구현 후 수정 필요
+// 카카오로그인 구현 후 수정
 
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BoardDto;
 import com.assemblock.assemblock_be.Service.BoardService;
+import com.assemblock.assemblock_be.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal; // 카카오로그인 구현 후 수정
-import com.assemblock.assemblock_be.security.UserDetailsImpl; // 카카오로그인 구현 후 수정
 
 import java.util.List;
 import java.util.Map;
@@ -21,10 +20,6 @@ import java.util.Map;
 public class BoardController {
     private final BoardService boardService;
 
-    /**
-     * 내 보드 목록 조회
-     * [GET] /api/boards
-     */
     @GetMapping
     public ResponseEntity<List<BoardDto.BoardSummaryResponse>> getMyBoards(
             @AuthenticationPrincipal UserDetailsImpl userDetails
@@ -34,10 +29,6 @@ public class BoardController {
         return ResponseEntity.ok(boards);
     }
 
-    /**
-     * 새 보드 생성
-     * [POST] /api/boards
-     */
     @PostMapping
     public ResponseEntity<BoardDto.BoardDetailResponse> createBoard(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -48,10 +39,6 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
     }
 
-    /**
-     * 특정 보드 상세 조회
-     * [GET] /api/boards/{boardId}
-     */
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> getBoardDetails(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -62,10 +49,6 @@ public class BoardController {
         return ResponseEntity.ok(boardDetail);
     }
 
-    /**
-     * 보드 정보 수정
-     * [PUT] /api/boards/{boardId}
-     */
     @PutMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> updateBoard(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -77,10 +60,6 @@ public class BoardController {
         return ResponseEntity.ok(updatedBoard);
     }
 
-    /**
-     * 보드 삭제
-     * [DELETE] /api/boards/{boardId}
-     */
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -91,10 +70,6 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * 보드에 블록 추가
-     * [POST] /api/boards/{boardId}/blocks
-     */
     @PostMapping("/{boardId}/blocks")
     public ResponseEntity<Void> addBlockToBoard(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -107,18 +82,25 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    /**
-     * 보드에서 블록 제거
-     * [DELETE] /api/boards/{boardId}/blocks/{blockId}
-     */
-    @DeleteMapping("/{boardId}/blocks/{blockId}")
-    public ResponseEntity<Void> removeBlockFromBoard(
+    @DeleteMapping("/{boardId}/blocks")
+    public ResponseEntity<Void> removeBlocksFromBoard(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId,
-            @PathVariable Long blockId
+            @RequestParam List<Long> blockIds
     ) {
         Long userId = userDetails.getUserId();
-        boardService.removeBlockFromBoard(userId, boardId, blockId);
+        boardService.removeBlocksFromBoard(userId, boardId, blockIds);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/proposals")
+    public ResponseEntity<Void> createTeamProposal(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestBody BoardDto.TeamProposalRequest requestDto
+    ) {
+        Long userId = userDetails.getUserId();
+        boardService.createTeamProposal(userId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 }
+
