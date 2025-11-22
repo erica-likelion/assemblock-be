@@ -1,58 +1,73 @@
 package com.assemblock.assemblock_be.Dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 import java.util.List;
 
 public class BoardDto {
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardCreateRequest {
+        @NotBlank @Size(max = 14)
         private String boardName;
+        @Size(max = 104)
         private String boardMemo;
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BoardUpdateRequest {
+        @NotBlank @Size(max = 14)
         private String boardName;
+        @Size(max = 104)
         private String boardMemo;
     }
 
     @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BoardSummaryResponse {
         private Long boardId;
         private String boardName;
         private int blockCount;
-        private List<String> previewImageUrls;
-
-        @Builder
-        public BoardSummaryResponse(Long boardId, String boardName, int blockCount, List<String> previewImageUrls) {
-            this.boardId = boardId;
-            this.boardName = boardName;
-            this.blockCount = blockCount;
-            this.previewImageUrls = previewImageUrls;
-        }
+        private List<String> previewTypes;
     }
 
     @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BoardDetailResponse {
         private Long boardId;
         private String boardName;
         private String boardMemo;
         private List<BlockResponseDto> blocks;
+    }
 
-        @Builder
-        public BoardDetailResponse(Long boardId, String boardName, String boardMemo, List<BlockResponseDto> blocks) {
-            this.boardId = boardId;
-            this.boardName = boardName;
-            this.boardMemo = boardMemo;
-            this.blocks = blocks;
-        }
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TeamProposalRequest {
+        @NotBlank @Size(max = 14)
+        private String projectTitle;
+
+        @Size(max = 200)
+        private String memo;
+
+        @NotBlank @Size(max = 100)
+        private String contact;
+
+        @NotBlank
+        private String recruitingPeriod;
+
+        private List<Long> targetBlockIds;
     }
 }
