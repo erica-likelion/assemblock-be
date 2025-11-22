@@ -1,36 +1,38 @@
 package com.assemblock.assemblock_be.Dto;
 
+import com.assemblock.assemblock_be.Entity.MemberRole;
+import com.assemblock.assemblock_be.Entity.ProfileType;
 import com.assemblock.assemblock_be.Entity.Review;
+import com.assemblock.assemblock_be.Entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewResponseDto {
     private Long reviewId;
-    private String reviewerName;
-    private String reviewerProfileUrl;
+    private String targetUserNickname;
+    private ProfileType targetUserProfileType;
+    private MemberRole targetUserMainRole;
     private String reviewContent;
     private String projectName;
     private String memberRole;
 
-    @Builder
-    public ReviewResponseDto(Long reviewId, String reviewerName, String reviewerProfileUrl, String reviewContent, String projectName, String memberRole) {
-        this.reviewId = reviewId;
-        this.reviewerName = reviewerName;
-        this.reviewerProfileUrl = reviewerProfileUrl;
-        this.reviewContent = reviewContent;
-        this.projectName = projectName;
-        this.memberRole = memberRole;
-    }
+    public static ReviewResponseDto fromEntity(Review review, User targetUser, String projectRole) {
+        MemberRole mainRole = targetUser.getMainRoles().stream().findFirst().orElse(MemberRole.BackEnd);
 
-    public static ReviewResponseDto fromEntity(Review review, String role) {
         return ReviewResponseDto.builder()
                 .reviewId(review.getId())
-                .reviewerName(review.getReviewer().getNickname())
-                .reviewerProfileUrl(review.getReviewer().getProfileImageUrl())
-                .reviewContent(review.getReview())
+                .targetUserNickname(targetUser.getNickname())
+                .targetUserProfileType(targetUser.getProfileType())
+                .targetUserMainRole(mainRole)
+                .reviewContent(review.getReview().name())
                 .projectName(review.getProject().getProposal().getProjectTitle())
-                .memberRole(role)
+                .memberRole(projectRole)
                 .build();
     }
 }
