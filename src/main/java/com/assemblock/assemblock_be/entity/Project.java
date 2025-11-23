@@ -1,12 +1,16 @@
 package com.assemblock.assemblock_be.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "projects")
+@Table(name = "Project")
 public class Project {
 
     @Id
@@ -14,7 +18,7 @@ public class Project {
     @Column(name = "project_id")
     private Long projectId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "proposal_id", nullable = false)
     private Proposal proposal;
 
@@ -26,12 +30,6 @@ public class Project {
     @Column(name = "project_status", nullable = false)
     private ProjectStatus projectStatus = ProjectStatus.recruiting;
 
-    @Column(name = "project_recruit", nullable = false)
-    private int projectRecruit;
-
-    @Column(name = "project_accpeted", nullable = false)
-    private int projectAccepted = 0;
-
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 }

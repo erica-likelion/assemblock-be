@@ -11,9 +11,8 @@ public class ProposalTargetId implements Serializable {
     private Long proposalId;
 
     @Column(name = "proposalblock_id")
-    private Long proposalBlockId;
+    private Long proposalBlockId;   // ★ camelCase 필수
 
-    // 기본 생성자
     public ProposalTargetId() {}
 
     public ProposalTargetId(Long proposalId, Long proposalBlockId) {
@@ -27,7 +26,7 @@ public class ProposalTargetId implements Serializable {
         if (!(o instanceof ProposalTargetId)) return false;
         ProposalTargetId that = (ProposalTargetId) o;
         return Objects.equals(proposalId, that.proposalId) &&
-                Objects.equals(proposalBlockId, that.proposalBlockId);
+               Objects.equals(proposalBlockId, that.proposalBlockId);
     }
 
     @Override

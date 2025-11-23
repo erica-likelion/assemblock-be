@@ -1,11 +1,15 @@
 package com.assemblock.assemblock_be.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "proposal_targets")
+@Table(name = "Proposal_target")
 public class ProposalTarget {
 
     @EmbeddedId
@@ -13,17 +17,18 @@ public class ProposalTarget {
 
     @ManyToOne
     @MapsId("proposalId")
-    @JoinColumn(name = "proposal_id", nullable = false)
+    @JoinColumn(name = "proposal_id")
     private Proposal proposal;
 
     @ManyToOne
-    @JoinColumn(name = "proposer_id", nullable = false)
-    private User proposer;
+    @MapsId("proposalBlockId")  
+    @JoinColumn(name = "proposalblock_id")
+    private Block block;
+
 
     @ManyToOne
-    @MapsId("proposalBlockId")
-    @JoinColumn(name = "proposalblock_id", nullable = false)
-    private Block proposalBlock;
+    @JoinColumn(name = "proposer_id")
+    private User proposer;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "response_status", nullable = false)

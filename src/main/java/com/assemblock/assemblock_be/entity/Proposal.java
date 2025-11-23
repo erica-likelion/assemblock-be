@@ -1,13 +1,18 @@
 package com.assemblock.assemblock_be.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "proposals")
+@Table(name = "Proposal")
 public class Proposal {
 
     @Id
@@ -19,7 +24,7 @@ public class Proposal {
     @JoinColumn(name = "proposer_id", nullable = false)
     private User proposer;
 
-    @Column(name = "discord_id", nullable = false)
+    @Column(name = "discord_id", nullable = false, length = 255)
     private String discordId;
 
     @Column(name = "recruit_start_date", nullable = false)
@@ -28,16 +33,12 @@ public class Proposal {
     @Column(name = "recruit_end_date", nullable = false)
     private LocalDate recruitEndDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "recruit_status", nullable = false)
-    private Status recruitStatus = Status.pending;
-
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "project_title", nullable = false)
     private String projectTitle;
 
-    @Column(name = "project_memo", nullable = false)
+    @Column(name = "project_memo", nullable = false, columnDefinition = "TEXT")
     private String projectMemo;
 }

@@ -2,11 +2,11 @@ package com.assemblock.assemblock_be.service;
 
 import com.assemblock.assemblock_be.entity.ProposalTarget;
 import com.assemblock.assemblock_be.entity.ProposalTargetId;
+import com.assemblock.assemblock_be.entity.Status;
 import com.assemblock.assemblock_be.repository.ProposalTargetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,19 +14,18 @@ public class ProposalTargetService {
 
     private final ProposalTargetRepository proposalTargetRepository;
 
-    public ProposalTarget create(ProposalTarget proposalTarget) {
-        return proposalTargetRepository.save(proposalTarget);
-    }
+    @Transactional
+    public ProposalTarget updateResponseStatus(Long proposalId, Long proposalBlockId, String status) {
+        ProposalTargetId id = new ProposalTargetId(proposalId, proposalBlockId);
 
-    public ProposalTarget findOne(ProposalTargetId id) {
-        return proposalTargetRepository.findById(id).orElse(null);
-    }
+        ProposalTarget target = proposalTargetRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "ProposalTarget not found. proposalId=" + proposalId + ", blockId=" + proposalBlockId));
 
-    public List<ProposalTarget> findAll() {
-        return proposalTargetRepository.findAll();
-    }
+        // Status enum: accepted / rejected / pending
+        Status newStatus = Status.valueOf(status.toLowerCase()); // 만약 enum이 소문자라면
+        target.setResponseStatus(newStatus);
 
-    public void delete(ProposalTargetId id) {
-        proposalTargetRepository.deleteById(id);
+        return proposalTargetRepository.save(target);
     }
 }

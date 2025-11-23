@@ -1,6 +1,7 @@
 package com.assemblock.assemblock_be.service;
 
 import com.assemblock.assemblock_be.entity.Review;
+import com.assemblock.assemblock_be.entity.ReviewStatus;
 import com.assemblock.assemblock_be.entity.Project;
 import com.assemblock.assemblock_be.entity.User;
 import com.assemblock.assemblock_be.repository.ReviewRepository;
@@ -43,7 +44,8 @@ public class ReviewService {
         review.setReviewer(new User(reviewerId));
         review.setReviewedUser(new User(reviewedUserId));
         review.setProject(p);
-        review.setReviewText(text);
+        review.setReviewStatus(ReviewStatus.valueOf(text));
+
 
         return reviewRepository.save(review);
     }

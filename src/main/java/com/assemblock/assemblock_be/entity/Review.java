@@ -1,12 +1,15 @@
 package com.assemblock.assemblock_be.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "reviews")
+@Table(name = "Review")
 public class Review {
 
     @Id
@@ -26,9 +29,7 @@ public class Review {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Column(name = "review", nullable = false, length = 2048)
-    private String reviewText;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Enumerated(EnumType.STRING)
+    @Column(name = "review", nullable = false)
+    private ReviewStatus reviewStatus;
 }

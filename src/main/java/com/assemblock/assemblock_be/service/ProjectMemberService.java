@@ -11,27 +11,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProjectMemberService {
 
-    private final ProjectMemberRepository repository;
+    private final ProjectMemberRepository projectMemberRepository;
 
     public ProjectMember create(ProjectMember pm) {
-        return repository.save(pm);
-    }
-
-    public ProjectMember findById(Long id) {
-        return repository.findById(id).orElse(null);
-    }
-
-    public List<ProjectMember> findAll() {
-        return repository.findAll();
+        return projectMemberRepository.save(pm);
     }
 
     public void delete(Long id) {
-        repository.deleteById(id);
+        projectMemberRepository.deleteById(id);
     }
 
-    // 내 팀 보기
+    // 🔥 추가해야 하는 3개 메서드
+    public ProjectMember findById(Long id) {
+        return projectMemberRepository.findById(id)
+                .orElse(null);
+    }
+
+    public List<ProjectMember> findAll() {
+        return projectMemberRepository.findAll();
+    }
+
     public List<ProjectMember> getTeamMembers(Long projectId) {
         return projectMemberRepository.findByProject_ProjectId(projectId);
     }
-
 }
