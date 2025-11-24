@@ -1,4 +1,4 @@
-package com.assemblock.assemblock_be.service;
+package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Entity.Project;
 import com.assemblock.assemblock_be.Entity.ProjectMember;

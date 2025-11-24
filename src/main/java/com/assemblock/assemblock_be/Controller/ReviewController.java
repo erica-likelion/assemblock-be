@@ -2,8 +2,6 @@
 
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.ReviewRequestDto;
-import com.assemblock.assemblock_be.Service.ReviewService;
 import com.assemblock.assemblock_be.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
-package com.assemblock.assemblock_be.controller;
+package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.entity.ProposalTarget;
-import com.assemblock.assemblock_be.service.ProposalTargetService;
+import com.assemblock.assemblock_be.Service.ProposalTargetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
