@@ -1,11 +1,21 @@
 package com.assemblock.assemblock_be.Entity;
 
-import com.assemblock.assemblock_be.Dto.BlockDto; // 수정: BlockRequestDto -> BlockDto
+import com.assemblock.assemblock_be.ProposalTarget;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Check;
+import org.hibernate.annotations.CreationTimestamp;
+import com.assemblock.assemblock_be.Dto.BlockDto;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 @Table(name = "Block")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Block extends BaseTimeEntity {
@@ -15,14 +25,12 @@ public class Block extends BaseTimeEntity {
     @Column(name = "block_id")
     private Long id;
 
-    // 작성자 (User 테이블의 user_id FK)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // tech_part (SQL DDL에 맞춰 단일 ENUM으로 매핑)
     @Enumerated(EnumType.STRING)
-    @Column(name = "tech_part") // SQL DDL 필드명 사용
+    @Column(name = "tech_part")
     private TechPart techPart;
 
     @Enumerated(EnumType.STRING)
@@ -30,14 +38,15 @@ public class Block extends BaseTimeEntity {
     private BlockCategory categoryName;
 
     @Column(name = "block_title", nullable = false)
-    private String blockTitle; // SQL: block_title
+    private String blockTitle; 
 
     @Enumerated(EnumType.STRING)
     @Column(name = "block_type", nullable = false)
     private BlockType blockType;
 
+    @Check(constraints = "contribution_score >= 0 AND contribution_score <= 10")
     @Column(name = "contribution_score", nullable = false)
-    private Integer contributionScore; // SQL: TINYINT
+    private Byte contributionScore;
 
     @Column(name = "tools_text", columnDefinition = "TEXT")
     private String toolsText;
@@ -49,7 +58,9 @@ public class Block extends BaseTimeEntity {
     public enum BlockCategory {
         데이터_시각화, API_연동, 레이아웃_그리드, 인터랙션_애니메이션, 상태_관리, 성능_최적화,
         백엔드, AI_기능_활용,
-        UXUI디자인, 비주얼_그래픽_디자인, 브랜드_디자인, 아이콘_디자인, 인터랙션_및_모션_디자인
+        UXUI디자인, 비주얼_그래픽_디자인, 브랜드_디자인, 아이콘_디자인, 인터랙션_및_모션_디자인,
+        경제_금융, 환경_지속가능성, 교육_학습, 주거_공간, 의료_건강, 문화_생활, 관계_심리,
+        육아_살림, 사회_커뮤니티, 기술_AI, 기타
     }
 
     public enum TechPart {

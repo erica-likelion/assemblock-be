@@ -1,5 +1,11 @@
 package com.assemblock.assemblock_be.Entity;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 import com.assemblock.assemblock_be.Dto.SignupDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,10 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "User")
@@ -63,6 +65,18 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column(name = "is_publishing")
     private Boolean isPublishing;
+     
+      @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<Block> blocks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<com.assemblock.assemblock_be.Entity.Proposal> proposals = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<com.assemblock.assemblock_be.Entity.ProposalTarget> proposalTargets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<Board> boards = new ArrayList<>();
 
     @Builder
     public User(Long kakaoId) {
@@ -75,7 +89,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     }
 
     /**
-     * 2단계 회원가입 (프로필 완성)
+     * 2단계 회원가입
      */
     public void completeProfile(SignupDto dto) {
         this.nickname = dto.getNickname();
@@ -88,6 +102,14 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.portfolioPdfUrl = dto.getPortfolioPdfUrl();
 
         this.isProfileComplete = true;
+    }
+    
+    public void increaseReviewSentCnt() {
+        this.reviewSentCnt++;
+    }
+
+    public void increaseReviewReceivedCnt() {
+        this.reviewReceivedCnt++;
     }
 
     @Override
