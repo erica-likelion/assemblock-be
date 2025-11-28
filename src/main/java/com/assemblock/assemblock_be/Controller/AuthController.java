@@ -10,23 +10,23 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/kakao")
-    public ResponseEntity<AuthResponseDto> kakaoLogin(
-            @RequestBody KakaoLoginRequestDto requestDto
+    public ResponseEntity<AuthResponse> kakaoLogin(
+            @RequestBody KakaoLoginDto requestDto
     ) {
-        AuthResponseDto responseDto = authService.kakaoLogin(requestDto.getAuthorizationCode());
+        AuthResponse responseDto = authService.kakaoLogin(requestDto.getAuthorizationCode());
         return ResponseEntity.ok(responseDto);
     }
 
     @PutMapping("/signup")
     public ResponseEntity<String> signup(
-            @Valid @RequestBody SignupRequestDto requestDto,
+            @Valid @RequestBody SignupDto requestDto,
             @AuthenticationPrincipal User user
     ) {
         Long currentUserId = user.getId();
@@ -36,10 +36,10 @@ public class AuthController {
 
     // 토큰 재발급
     @PostMapping("/refresh")
-    public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
-            @Valid @RequestBody TokenRefreshRequestDto requestDto
+    public ResponseEntity<TokenRefreshResponse> refreshAccessToken(
+            @Valid @RequestBody TokenRefreshDto requestDto
     ) {
-        TokenRefreshResponseDto responseDto = authService.refreshAccessToken(requestDto.getRefreshToken());
+        TokenRefreshResponse responseDto = authService.refreshAccessToken(requestDto.getRefreshToken());
         return ResponseEntity.ok(responseDto);
     }
 }

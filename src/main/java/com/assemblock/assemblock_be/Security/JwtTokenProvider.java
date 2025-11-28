@@ -27,16 +27,14 @@ public class JwtTokenProvider {
 
     @PostConstruct
     public void init() {
-        // HMAC-SHA 키 생성
+
         this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    // Access Token 생성
     public String createAccessToken(Long userId) {
         return createToken(userId, accessTokenExpirationMs);
     }
 
-    // Refresh Token 생성
     public String createRefreshToken(Long userId) {
         return createToken(userId, refreshTokenExpirationMs);
     }
@@ -46,14 +44,13 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + expirationMs);
 
         return Jwts.builder()
-                .setSubject(Long.toString(userId)) // 사용자의 ID를 subject로 저장
+                .setSubject(Long.toString(userId))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    // 토큰에서 UserId(subject) 추출
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -63,13 +60,12 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
-    // 토큰 유효성 검증
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (Exception ex) {
-            // (로그) ex.printStackTrace();
+            ex.printStackTrace();
             return false;
         }
     }

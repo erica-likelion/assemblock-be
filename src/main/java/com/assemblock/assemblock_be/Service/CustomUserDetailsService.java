@@ -15,15 +15,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // Spring Security가 username으로 유저를 찾을 때 호출
-    // (우리는 username 대신 userId(Long)를 String으로 변환하여 사용)
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         User user = userRepository.findById(Long.parseLong(userId))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + userId));
 
-        // User 엔티티가 UserDetails를 구현하도록 수정 필요
         return user;
     }
 }

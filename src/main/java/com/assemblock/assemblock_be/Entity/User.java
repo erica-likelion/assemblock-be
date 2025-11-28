@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Entity;
 
-import com.assemblock.assemblock_be.Dto.SignupRequestDto;
+import com.assemblock.assemblock_be.Dto.SignupDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "users")
+@Table(name = "User")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseTimeEntity implements UserDetails {
@@ -39,22 +39,24 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(name = "portfolio_pdf_url", length = 2048)
     private String portfolioPdfUrl;
 
-    @Column(name = "profile_image_index")
-    private Integer profileImageIndex;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "profile_type")
+    private UserProfileType profileType;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private List<Role> roles = new ArrayList<>();
 
     @Column(name = "is_profile_complete")
     private boolean isProfileComplete = false;
 
-    @Column(name = "user_level")
-    private Integer userLevel;
+    @Column(name = "review_sent_cnt")
+    private Integer reviewSentCnt;
 
-    @Column(name = "reliability_cnt")
-    private Integer reliabilityCnt;
+    @Column(name = "review_received_cnt")
+    private Integer reviewReceivedCnt;
 
     @Column(name = "reliability_level", precision = 5, scale = 2)
     private BigDecimal reliabilityLevel;
@@ -66,16 +68,21 @@ public class User extends BaseTimeEntity implements UserDetails {
     public User(Long kakaoId) {
         this.kakaoId = kakaoId;
         this.isProfileComplete = false;
-        this.userLevel = 1;
-        this.reliabilityCnt = 0;
+        this.reviewSentCnt = 0;
+        this.reviewReceivedCnt = 0;
         this.reliabilityLevel = new BigDecimal("0.0");
         this.isPublishing = true;
     }
 
-    public void completeProfile(SignupRequestDto dto) {
+    /**
+     * 2단계 회원가입 (프로필 완성)
+     */
+    public void completeProfile(SignupDto dto) {
         this.nickname = dto.getNickname();
         this.roles = new ArrayList<>(dto.getRoles());
-        this.profileImageIndex = dto.getProfileImageIndex();
+
+        this.profileType = UserProfileType.values()[dto.getProfileImageIndex() - 1];
+
         this.introduction = dto.getIntroduction();
         this.portfolioUrl = dto.getPortfolioUrl();
         this.portfolioPdfUrl = dto.getPortfolioPdfUrl();

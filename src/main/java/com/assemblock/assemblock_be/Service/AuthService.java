@@ -1,10 +1,10 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.*; // Dto 임포트
+import com.assemblock.assemblock_be.Dto.*;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.UserRepository;
 import com.assemblock.assemblock_be.Security.JwtTokenProvider;
-import io.jsonwebtoken.JwtException; // 예외 임포트
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,11 +30,8 @@ public class AuthService {
     private String kakaoRedirectUri;
 
 
-    /**
-     * 1단계: 카카오 로그인 (신규 유저 시 자동 회원가입)
-     */
     @Transactional
-    public AuthResponseDto kakaoLogin(String authorizationCode) {
+    public AuthResponse kakaoLogin(String authorizationCode) {
 
         String kakaoAccessToken = getKakaoAccessToken(authorizationCode);
         Long kakaoId = getKakaoUserId(kakaoAccessToken);
@@ -55,7 +52,7 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        return new AuthResponseDto(
+        return new AuthResponse(
                 accessToken,
                 refreshToken,
                 isNewUser,
@@ -63,11 +60,8 @@ public class AuthService {
         );
     }
 
-    /**
-     * 2단계: 추가 정보 입력 (프로필 완성)
-     */
     @Transactional
-    public void completeProfile(Long userId, SignupRequestDto requestDto) {
+    public void completeProfile(Long userId, SignupDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + userId));
         user.completeProfile(requestDto);
@@ -77,7 +71,7 @@ public class AuthService {
      * (신규) 액세스 토큰 재발급
      */
     @Transactional
-    public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {
+    public TokenRefreshResponse refreshAccessToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new JwtException("Invalid Refresh Token");
         }
@@ -89,7 +83,7 @@ public class AuthService {
 
         String newAccessToken = jwtTokenProvider.createAccessToken(user.getId());
 
-        return new TokenRefreshResponseDto(newAccessToken, refreshToken);
+        return new TokenRefreshResponse(newAccessToken, refreshToken);
     }
 
     private String getKakaoAccessToken(String code) {
@@ -106,10 +100,10 @@ public class AuthService {
                 .bodyToMono(Map.class)
                 .block();
 
-        return (String) response.get("access_token");
+        return response.get("access_token");
     }
     private Long getKakaoUserId(String accessToken) {
-        String userUri = "https://kapi.kakao.com/v2/user/me";
+        String userUri = "https://kapi.kakao.com/user/me";
 
         Map<String, Object> response = webClient.get()
                 .uri(userUri)

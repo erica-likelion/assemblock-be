@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.UserResponseDto;
+import com.assemblock.assemblock_be.Dto.UserResponse;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -22,11 +22,11 @@ public class UserController {
      * (헤더의 JWT 토큰을 바탕으로 인증)
      */
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMyProfile(
+    public ResponseEntity<UserResponse> getMyProfile(
             @AuthenticationPrincipal User user
     ) {
         Long currentUserId = user.getId();
-        UserResponseDto responseDto = userService.getMyProfile(currentUserId);
-        return ResponseEntity.ok(responseDto);
+        UserResponse response = userService.getMyProfile(currentUserId);
+        return ResponseEntity.ok(response);
     }
 }
