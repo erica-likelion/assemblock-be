@@ -27,7 +27,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private Long kakaoId;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String nickname;
 
     @Column(name = "introduction")
