@@ -1,0 +1,37 @@
+package com.assemblock.assemblock_be.service;
+
+import com.assemblock.assemblock_be.Entity.ProjectMember;
+import com.assemblock.assemblock_be.repository.ProjectMemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class ProjectMemberService {
+
+    private final ProjectMemberRepository projectMemberRepository;
+
+    public ProjectMember create(ProjectMember pm) {
+        return projectMemberRepository.save(pm);
+    }
+
+    public void delete(Long id) {
+        projectMemberRepository.deleteById(id);
+    }
+
+    // 🔥 추가해야 하는 3개 메서드
+    public ProjectMember findById(Long id) {
+        return projectMemberRepository.findById(id)
+                .orElse(null);
+    }
+
+    public List<ProjectMember> findAll() {
+        return projectMemberRepository.findAll();
+    }
+
+    public List<ProjectMember> getTeamMembers(Long projectId) {
+        return projectMemberRepository.findByProject_ProjectId(projectId);
+    }
+}

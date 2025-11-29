@@ -1,40 +1,38 @@
 package com.assemblock.assemblock_be.Dto;
 
+import com.assemblock.assemblock_be.Entity.MemberRole;
+import com.assemblock.assemblock_be.Entity.ProfileType;
 import com.assemblock.assemblock_be.Entity.Review;
+import com.assemblock.assemblock_be.Entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import java.time.LocalDateTime;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewResponseDto {
     private Long reviewId;
-    private String nickname;
-    private String profileUrl;
-    private String review;
-    private String projectTitle;
+    private String targetUserNickname;
+    private ProfileType targetUserProfileType;
+    private MemberRole targetUserMainRole;
+    private String reviewContent;
+    private String projectName;
     private String memberRole;
-    private LocalDateTime createdAt;
 
-    @Builder
-    public ReviewResponseDto(Long reviewId, String nickname, String profileUrl, String review, String projectTitle, String memberRole, LocalDateTime createdAt) {
-        this.reviewId = reviewId;
-        this.nickname = nickname;
-        this.profileUrl = profileUrl;
-        this.review = review;
-        this.projectTitle = projectTitle;
-        this.memberRole = memberRole;
-        this.createdAt = createdAt;
-    }
+    public static ReviewResponseDto fromEntity(Review review, User targetUser, String projectRole) {
+        MemberRole mainRole = targetUser.getMainRoles().stream().findFirst().orElse(MemberRole.BackEnd);
 
-    public static ReviewResponseDto fromEntity(Review review, String memberRole) {
         return ReviewResponseDto.builder()
                 .reviewId(review.getId())
-                .nickname(review.getReviewedUser().getNickname())
-                .profileUrl(review.getReviewedUser().getProfileImageUrl())
-                .review(review.getReview())
-                .projectTitle(review.getProject().getProposal().getProjectTitle())
-                .memberRole(memberRole)
-                .createdAt(review.getCreatedAt())
+                .targetUserNickname(targetUser.getNickname())
+                .targetUserProfileType(targetUser.getProfileType())
+                .targetUserMainRole(mainRole)
+                .reviewContent(review.getReview().name())
+                .projectName(review.getProject().getProposal().getProjectTitle())
+                .memberRole(projectRole)
                 .build();
     }
 }
