@@ -103,3 +103,4 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
+

@@ -71,3 +71,4 @@ public class BoardDto {
         private List<Long> targetBlockIds;
     }
 }
+
