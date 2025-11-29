@@ -1,10 +1,7 @@
 package com.assemblock.assemblock_be.Entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,7 +11,9 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Boards",
+@AllArgsConstructor
+@Builder
+@Table(name = "Board",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_user_board_name",
@@ -22,7 +21,6 @@ import java.util.List;
                 )
         }
 )
-
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,15 +41,9 @@ public class Board {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "board", orphanRemoval = true)
     private List<BoardBlock> boardBlocks = new ArrayList<>();
-
-    @Builder
-    public Board(User user, String boardName, String boardMemo) {
-        this.user = user;
-        this.boardName = boardName;
-        this.boardMemo = boardMemo;
-    }
 
     public void update(String boardName, String boardMemo) {
         if (boardName != null && !boardName.isBlank()) {
