@@ -1,0 +1,35 @@
+package com.assemblock.assemblock_be.Dto;
+
+import com.assemblock.assemblock_be.Entity.Block;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
+@Getter
+public class BlockDto {
+
+    @NotBlank(message = "블록 제목은 필수입니다.")
+    private String blockTitle;
+
+    @NotNull(message = "카테고리는 필수입니다.")
+    private Block.BlockCategory categoryName;
+
+    @NotNull(message = "카테고리는 필수입니다.")
+    private Block.TechPart techPart;
+
+    @NotNull(message = "블록 타입은 필수입니다.")
+    private Block.BlockType blockType;
+
+    @NotNull(message = "기여도는 필수입니다.")
+    @Min(0) @Max(10)
+    private Integer contributionScore;
+
+    @NotBlank(message = "툴 설명은 필수입니다.")
+    private String toolsText;
+
+    @NotBlank(message = "한줄 요약은 필수입니다.")
+    private String oneLineSummary;
+
+}

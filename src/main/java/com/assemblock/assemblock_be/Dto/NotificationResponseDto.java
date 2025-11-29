@@ -1,20 +1,18 @@
 package com.assemblock.assemblock_be.Dto;
 
+import com.assemblock.assemblock_be.Entity.ProfileType;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NotificationResponseDto {
     private Long proposalId;
     private String senderName;
-    private String senderProfileImageUrl;
+    private ProfileType senderProfileType;
     private String content;
-
-    @Builder
-    public NotificationResponseDto(Long proposalId, String senderName, String senderProfileImageUrl, String content) {
-        this.proposalId = proposalId;
-        this.senderName = senderName;
-        this.senderProfileImageUrl = senderProfileImageUrl;
-        this.content = content;
-    }
 }

@@ -1,9 +1,11 @@
 package com.assemblock.assemblock_be.Entity;
 
+import com.assemblock.assemblock_be.ProjectMember;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Project")
 public class Project {
@@ -22,7 +25,7 @@ public class Project {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id", nullable = false, unique = true)
-    private Proposal proposal;
+    private com.assemblock.assemblock_be.Entity.Proposal proposal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposer_id", nullable = false)
@@ -30,7 +33,7 @@ public class Project {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "project_status", nullable = false)
-    private ProjectStatus projectStatus = ProjectStatus.recruiting;
+    private com.assemblock.assemblock_be.Entity.ProjectStatus projectStatus = com.assemblock.assemblock_be.Entity.ProjectStatus.recruiting;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -40,5 +43,5 @@ public class Project {
     private List<ProjectMember> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "project", orphanRemoval = true)
-    private List<Review> reviews = new ArrayList<>();
+    private List<com.assemblock.assemblock_be.Entity.Review> reviews = new ArrayList<>();
 }
