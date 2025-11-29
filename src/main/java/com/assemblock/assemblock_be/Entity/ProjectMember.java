@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -47,4 +48,14 @@ public class ProjectMember {
 
     @Column(name = "is_proposer", nullable = false)
     private Boolean isProposer = false;
+    
+    @Builder
+    public ProjectMember(Project project, User user, Proposal proposal, User proposer, MemberRole memberRole, Boolean isProposer) {
+        this.project = project;
+        this.user = user;
+        this.proposal = proposal;
+        this.proposer = proposer;
+        this.memberRole = memberRole;
+        this.isProposer = isProposer;
+    }
 }

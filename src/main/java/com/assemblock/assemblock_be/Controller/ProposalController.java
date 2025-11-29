@@ -32,11 +32,13 @@ public class ProposalController {
         return proposalService.findById(id);
     }
 
+    // 3) 전체 제안 조회
     @GetMapping
     public List<Proposal> findAll() {
         return proposalService.findAll();
     }
 
+    // 4) 삭제
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         proposalService.delete(id);

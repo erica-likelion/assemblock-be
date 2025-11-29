@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.entity.ProposalTarget;
+import com.assemblock.assemblock_be.Entity.ProposalTarget;
 import com.assemblock.assemblock_be.Service.ProposalTargetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/proposal-targets")
 public class ProposalTargetController {
+
     private final ProposalTargetService proposalTargetService;
 
+    // 특정 Proposal + Block 에 대한 제안 상태 변경
     @PostMapping("/respond")
     public ProposalTarget respondToProposal(
             @RequestParam Long proposalId,

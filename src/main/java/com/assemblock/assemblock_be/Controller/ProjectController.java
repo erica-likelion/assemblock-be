@@ -11,8 +11,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/projects")
 public class ProjectController {
+
     private final ProjectService projectService;
 
+    // 1) 내가 만든 프로젝트 목록
     @GetMapping("/mine/{userId}")
     public List<Project> getMyProjects(@PathVariable Long userId) {
         return projectService.getMyProjects(userId);
@@ -31,6 +33,7 @@ public class ProjectController {
         projectService.completeProject(projectId, userId);
     }
 
+    // 4) 완료된 프로젝트 목록
     @GetMapping("/completed/{userId}")
     public List<Project> getCompletedProjects(@PathVariable Long userId) {
         return projectService.getCompletedProjects(userId);

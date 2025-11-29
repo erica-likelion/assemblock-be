@@ -38,7 +38,7 @@ public class Block extends BaseTimeEntity {
     private BlockCategory categoryName;
 
     @Column(name = "block_title", nullable = false)
-    private String blockTitle; 
+    private String blockTitle;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "block_type", nullable = false)
@@ -56,10 +56,10 @@ public class Block extends BaseTimeEntity {
 
 
     public enum BlockCategory {
-        데이터_시각화, API_연동, 레이아웃_그리드, 인터랙션_애니메이션, 상태_관리, 성능_최적화,
+        데이터_시각화, API_연동, 레이아웃_그리드, 인터랙션_애니메이션, 상태_관리, 성능_최적화, // back-end
         백엔드, AI_기능_활용,
-        UXUI디자인, 비주얼_그래픽_디자인, 브랜드_디자인, 아이콘_디자인, 인터랙션_및_모션_디자인,
-        경제_금융, 환경_지속가능성, 교육_학습, 주거_공간, 의료_건강, 문화_생활, 관계_심리,
+        UXUI디자인, 비주얼_그래픽_디자인, 브랜드_디자인, 아이콘_디자인, 인터랙션_및_모션_디자인, // front-end
+        경제_금융, 환경_지속가능성, 교육_학습, 주거_공간, 의료_건강, 문화_생활, 관계_심리, // idea
         육아_살림, 사회_커뮤니티, 기술_AI, 기타
     }
 

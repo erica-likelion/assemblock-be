@@ -65,8 +65,8 @@ public class User extends BaseTimeEntity implements UserDetails {
 
     @Column(name = "is_publishing")
     private Boolean isPublishing;
-     
-      @OneToMany(mappedBy = "user", orphanRemoval = true)
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Block> blocks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
