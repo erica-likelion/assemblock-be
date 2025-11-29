@@ -1,11 +1,11 @@
-package com.assemblock.assemblock_be.Service;
+package com.assemblock.assemblock_be.service;
 
 import com.assemblock.assemblock_be.Entity.Review;
 import com.assemblock.assemblock_be.Entity.ReviewStatus;
 import com.assemblock.assemblock_be.Entity.Project;
 import com.assemblock.assemblock_be.Entity.User;
-import com.assemblock.assemblock_be.Repository.ReviewRepository;
-import com.assemblock.assemblock_be.Repository.ProjectRepository;
+import com.assemblock.assemblock_be.repository.ReviewRepository;
+import com.assemblock.assemblock_be.repository.ProjectRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

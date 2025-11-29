@@ -1,7 +1,7 @@
-package com.assemblock.assemblock_be.Service;
+package com.assemblock.assemblock_be.service;
 
 import com.assemblock.assemblock_be.Entity.ProjectMember;
-import com.assemblock.assemblock_be.Repository.ProjectMemberRepository;
+import com.assemblock.assemblock_be.repository.ProjectMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

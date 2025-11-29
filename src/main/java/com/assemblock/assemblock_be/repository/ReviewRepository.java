@@ -1,4 +1,4 @@
-package com.assemblock.assemblock_be.Repository;
+package com.assemblock.assemblock_be.repository;
 
 import java.util.List;
 

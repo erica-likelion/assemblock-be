@@ -1,4 +1,4 @@
-package com.assemblock.assemblock_be.Repository;
+package com.assemblock.assemblock_be.repository;
 
 import com.assemblock.assemblock_be.Entity.ProposalTarget;
 import com.assemblock.assemblock_be.Entity.ProposalTargetId;

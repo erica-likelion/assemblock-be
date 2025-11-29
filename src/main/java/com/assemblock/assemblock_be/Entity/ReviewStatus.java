@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Entity;
 
-public enum ReviewStatus {
+public enum ReviewRating {
     good,
     notbad,
     disappoint

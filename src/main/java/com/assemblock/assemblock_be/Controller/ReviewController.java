@@ -1,7 +1,7 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Entity.Review;
-import com.assemblock.assemblock_be.Service.ReviewService;
+import com.assemblock.assemblock_be.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
