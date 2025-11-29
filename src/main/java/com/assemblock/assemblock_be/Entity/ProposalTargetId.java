@@ -11,7 +11,7 @@ public class ProposalTargetId implements Serializable {
     private Long proposalId;
 
     @Column(name = "proposalblock_id")
-    private Long proposalBlockId;   // ★ camelCase 필수
+    private Long proposalBlockId; 
 
     public ProposalTargetId() {}
 
