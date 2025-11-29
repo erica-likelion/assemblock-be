@@ -1,32 +1,38 @@
 package com.assemblock.assemblock_be.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "Proposal_targets")
-@IdClass(ProposalTargetId.class)
+@AllArgsConstructor
+@Builder
+@Table(name = "Proposal_target")
 public class ProposalTarget {
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id", nullable = false)
-    private Proposal proposal;
+    @EmbeddedId
+    private com.assemblock.assemblock_be.Entity.ProposalTargetId id;
 
-    @Id
+    @JsonIgnore
+    @MapsId("proposalId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposalblock_id", nullable = false)
-    private Block proposalBlock;
+    @JoinColumn(name = "proposal_id")
+    private com.assemblock.assemblock_be.Entity.Proposal proposal;
+
+    @JsonIgnore
+    @MapsId("proposalBlockId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposalblock_id")
+    private Block block;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposer_id", nullable = false)
     private User proposer;
 
     @Setter
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "response_status", nullable = false)
-    private ProposalStatus responseStatus = ProposalStatus.pending;
+    private Status responseStatus = Status.pending;
 }

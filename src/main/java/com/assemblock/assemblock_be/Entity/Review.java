@@ -1,5 +1,6 @@
 package com.assemblock.assemblock_be.Entity;
 
+import com.assemblock.assemblock_be.Project;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -42,7 +43,7 @@ public class Review {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "review", nullable = false)
-    private ReviewRating review;
+    private com.assemblock.assemblock_be.Entity.ReviewRating review;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -1,11 +1,11 @@
 server:
-  port: 8080
+port: 8080
 
 spring:
   datasource:
-    url: jdbc:mysql://assemblock.cf8wcw6w2dp0.ap-southeast-2.rds.amazonaws.com:3306/assemblock_db?serverTimezone=UTC&characterEncoding=UTF-8
-    username: kukchaewon
-    password: [password]
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -16,3 +16,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+kakao:
+  rest-api-key: ${KAKAO_API_KEY}
+  redirect-uri: http://localhost:8080/callback
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration-ms: 1800000
+  refresh-token-expiration-ms: 604800000

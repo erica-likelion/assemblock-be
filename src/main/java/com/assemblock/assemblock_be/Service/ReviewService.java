@@ -1,6 +1,5 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.ReviewRequestDto;
 import com.assemblock.assemblock_be.Entity.Project;
 import com.assemblock.assemblock_be.Entity.Review;
 import com.assemblock.assemblock_be.Entity.User;
