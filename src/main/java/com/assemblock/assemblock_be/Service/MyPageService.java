@@ -1,3 +1,5 @@
+// S3 설정 후 수정
+
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
@@ -12,6 +14,7 @@ import com.assemblock.assemblock_be.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +29,7 @@ public class MyPageService {
     private final BlockRepository blockRepository;
     private final ReviewRepository reviewRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    // private final S3Service s3Service;
 
     public MyProfileResponseDto getMyProfile(Long currentUserId) {
         User user = findUserById(currentUserId);
@@ -35,58 +39,60 @@ public class MyPageService {
     @Transactional
     public MyProfileResponseDto updateMyProfile(Long currentUserId, ProfileUpdateRequestDto requestDto) {
         User user = findUserById(currentUserId);
-        MemberRole newMainRole = null;
-        if (requestDto.getMainRole() != null && !requestDto.getMainRole().isBlank()) {
-            try {
-                newMainRole = MemberRole.valueOf(requestDto.getMainRole());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("유효하지 않은 역할(파트)입니다: " + requestDto.getMainRole());
-            }
-        }
-
         user.updateProfile(
                 requestDto.getNickname(),
                 requestDto.getPortfolioUrl(),
                 requestDto.getIntroduction(),
-                newMainRole,
-                requestDto.getProfileImageUrl(),
+                requestDto.getMainRoles(),
+                requestDto.getProfileType(),
                 requestDto.getPortfolioPdfUrl()
         );
         return MyProfileResponseDto.fromEntity(user);
     }
 
+    @Transactional
+    public String uploadFile(Long currentUserId, MultipartFile file) {
+        User user = findUserById(currentUserId);
+
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어있습니다.");
+        }
+
+        // 임시 URL
+        String fileName = file.getOriginalFilename();
+        String mockUrl = "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
+
+        return mockUrl;
+    }
+
     public List<BlockResponseDto> getMyBlocks(Long currentUserId, String type) {
         User user = findUserById(currentUserId);
         List<Block> blocks;
-        if ("ALL".equalsIgnoreCase(type)) {
-            blocks = blockRepository.findByUser(user);
+
+        if ("ALL".equalsIgnoreCase(type) || type == null) {
+            blocks = blockRepository.findAllByUser(user);
         } else {
             try {
                 BlockType blockType = BlockType.valueOf(type.toUpperCase());
-                blocks = blockRepository.findByUserAndBlockType(user, blockType);
+                blocks = blockRepository.findAllByUserAndBlockType(user, blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);
             }
         }
 
         return blocks.stream()
-                .map(block -> BlockResponseDto.builder()
-                        .blockId(block.getId())
-                        .title(block.getTitle())
-                        .description(block.getOnelineSummary())
-                        .username(block.getUser().getNickname())
-                        .coverImageUrl(block.getResultUrl())
-                        .build())
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
     public List<ReviewResponseDto> getMyReviews(Long currentUserId, String type) {
         User currentUser = findUserById(currentUserId);
         List<Review> reviewsToProcess;
+
         if ("SCOUTING".equalsIgnoreCase(type)) {
-            reviewsToProcess = reviewRepository.findByReviewer(currentUser);
+            reviewsToProcess = reviewRepository.findAllByUser(currentUser);
         } else if ("PARTICIPATION".equalsIgnoreCase(type)) {
-            reviewsToProcess = reviewRepository.findByUser(currentUser);
+            reviewsToProcess = reviewRepository.findAllByReviewedUser(currentUser);
         } else {
             throw new IllegalArgumentException("유효하지 않은 리뷰 타입입니다: " + type);
         }
@@ -94,18 +100,16 @@ public class MyPageService {
         return reviewsToProcess.stream()
                 .map(review -> {
                     Project project = review.getProject();
-                    Optional<ProjectMember> myRoleInProjectOpt = projectMemberRepository.findByProjectAndUser(
-                            project, currentUser
-                    );
-                    if (myRoleInProjectOpt.isEmpty()) {
-                        return null;
-                    }
+                    User targetUser = "SCOUTING".equalsIgnoreCase(type) ? review.getReviewedUser() : review.getUser();
 
-                    ProjectMember myRole = myRoleInProjectOpt.get();
-                    boolean amIProposer = myRole.getIsProposer();
-                    String roleName = amIProposer ? "크리에이터" : "워크스페이스";
+                    Optional<ProjectMember> roleOpt = projectMemberRepository.findByProjectAndUser(project, targetUser);
+                    if (roleOpt.isEmpty()) return null;
 
-                    return ReviewResponseDto.fromEntity(review, roleName);
+                    ProjectMember member = roleOpt.get();
+                    boolean isProposer = member.getIsProposer();
+                    String roleName = isProposer ? "크리에이터" : "워크스페이스";
+
+                    return ReviewResponseDto.fromEntity(review, targetUser, roleName);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

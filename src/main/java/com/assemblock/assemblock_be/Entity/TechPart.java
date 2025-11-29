@@ -27,10 +27,7 @@ public class TechPart {
     @OneToMany(mappedBy = "techPart")
     private List<Block> blocks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "techPart")
-    private Set<UserTechPart> userTechParts = new HashSet<>();
-
     public enum TechName {
-        Plan, Design, PM, FrontEnd, BackEnd
+        Design, FrontEnd, BackEnd
     }
 }

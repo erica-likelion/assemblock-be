@@ -16,10 +16,6 @@ import java.util.List;
 public class ProfileController {
     private final ProfileService profileService;
 
-    /**
-     * 타인 프로필 정보 조회
-     * [GET] /api/profiles/{userId}
-     */
     @GetMapping("/{userId}")
     public ResponseEntity<MyProfileResponseDto> getPublicProfile(
             @PathVariable Long userId
@@ -28,11 +24,6 @@ public class ProfileController {
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * 타인의 어셈블록 목록 조회
-     * [GET] /api/profiles/{userId}/blocks?type={blockType}
-     * (type: "ALL", "IDEA", "TECHNOLOGY")
-     */
     @GetMapping("/{userId}/blocks")
     public ResponseEntity<List<BlockResponseDto>> getPublicBlocks(
             @PathVariable Long userId,
@@ -42,11 +33,6 @@ public class ProfileController {
         return ResponseEntity.ok(blocks);
     }
 
-    /**
-     * 타인의 후기블록 목록 조회
-     * [GET] /api/profiles/{userId}/reviews?type={reviewType}
-     * (type: "SCOUTING", "PARTICIPATION")
-     */
     @GetMapping("/{userId}/reviews")
     public ResponseEntity<List<ReviewResponseDto>> getPublicReviews(
             @PathVariable Long userId,
