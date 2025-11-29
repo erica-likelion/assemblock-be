@@ -1,9 +1,8 @@
 package com.assemblock.assemblock_be.Entity;
 
+import com.assemblock.assemblock_be.ProposalTarget;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -14,7 +13,9 @@ import java.util.ArrayList;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "Proposals")
+@AllArgsConstructor
+@Builder
+@Table(name = "Proposal")
 public class Proposal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,10 +35,6 @@ public class Proposal {
     @Column(name = "recruit_end_date", nullable = false)
     private LocalDate recruitEndDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "recruit_status", nullable = false)
-    private ProposalRecruitStatus recruitStatus = ProposalRecruitStatus.pending;
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -48,6 +45,7 @@ public class Proposal {
     @Column(name = "project_memo", nullable = false, columnDefinition = "TEXT")
     private String projectMemo;
 
+    @Builder.Default
     @OneToMany(mappedBy = "proposal", orphanRemoval = true)
     private List<ProposalTarget> targets = new ArrayList<>();
 }
