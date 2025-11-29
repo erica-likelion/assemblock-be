@@ -1,18 +1,23 @@
 package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.TechPart;
+import com.assemblock.assemblock_be.Entity.Block;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CategoryResponseDto {
-    private Long categoryId;
-    private String categoryName;
-    private List<SubCategoryDto> subCategories;
+    private String techPart;
+    private List<String> categoryNames;
 
-    public CategoryResponseDto(TechPart category, List<SubCategoryDto> subCategories) {
-        this.categoryId = category.getId();
-        this.categoryName = category.getTechName().name();
-        this.subCategories = subCategories;
+    public CategoryResponseDto(Block.TechPart techPart, List<String> categoryNames) {
+        this.techPart = techPart.name();
+        this.categoryNames = categoryNames;
     }
 }
