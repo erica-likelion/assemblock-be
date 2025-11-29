@@ -1,7 +1,8 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Entity.Proposal;
-import com.assemblock.assemblock_be.service.ProposalService;
+import com.assemblock.assemblock_be.Service.ProposalService;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,30 +13,20 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/proposals")
 public class ProposalController {
-
     private final ProposalService proposalService;
 
-    // 1) 제안 생성
     @PostMapping
-    public Proposal sendProposal(
-            @RequestParam Long proposerId,
-            @RequestParam String discordId,
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam String title,
-            @RequestParam String memo
-    ) {
+    public Proposal sendProposal(@RequestBody ProposalRequestDto request) {
         return proposalService.sendProposal(
-                proposerId,
-                discordId,
-                LocalDate.parse(startDate),
-                LocalDate.parse(endDate),
-                title,
-                memo
+                request.getProposerId(),
+                request.getDiscordId(),
+                LocalDate.parse(request.getStartDate()),
+                LocalDate.parse(request.getEndDate()),
+                request.getTitle(),
+                request.getMemo()
         );
     }
 
-    // 2) 제안 조회
     @GetMapping("/{id}")
     public Proposal findProposal(@PathVariable Long id) {
         return proposalService.findById(id);
@@ -51,5 +42,15 @@ public class ProposalController {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         proposalService.delete(id);
+    }
+
+    @Data
+    public static class ProposalRequestDto {
+        private Long proposerId;
+        private String discordId;
+        private String startDate;
+        private String endDate;
+        private String title;
+        private String memo;
     }
 }

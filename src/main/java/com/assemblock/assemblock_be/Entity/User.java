@@ -103,7 +103,7 @@ public class User extends BaseTimeEntity implements UserDetails {
 
         this.isProfileComplete = true;
     }
-
+    
     public void increaseReviewSentCnt() {
         this.reviewSentCnt++;
     }

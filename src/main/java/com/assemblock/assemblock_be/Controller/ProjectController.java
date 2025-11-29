@@ -1,7 +1,7 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Entity.Project;
-import com.assemblock.assemblock_be.service.ProjectService;
+import com.assemblock.assemblock_be.Service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,13 +20,11 @@ public class ProjectController {
         return projectService.getMyProjects(userId);
     }
 
-    // 2) 진행중인 프로젝트 목록
     @GetMapping("/ongoing")
-    public List<Project> getOngoingProjects() {
-        return projectService.getOngoingProjects();
+    public List<Project> getOngoingProjects(@RequestParam Long userId) {
+        return projectService.getOngoingProjects(userId);
     }
 
-    // 3) 프로젝트 완료 처리
     @PatchMapping("/{projectId}/complete")
     public void completeProject(
             @PathVariable Long projectId,

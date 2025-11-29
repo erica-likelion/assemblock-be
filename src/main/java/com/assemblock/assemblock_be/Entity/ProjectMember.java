@@ -1,30 +1,61 @@
 package com.assemblock.assemblock_be.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
 @Entity
-@Table(name = "project_member")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "Project_member",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_project_member",
+                        columnNames = {"project_id", "user_id"}
+                )
+        }
+)
 public class ProjectMember {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id", nullable = false, unique = true, updatable = false)
     private Long memberId;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
+    private com.assemblock.assemblock_be.Entity.Project project;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Enumerated(EnumType.STRING)
-    private MemberRole memberRole;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id", nullable = false)
+    private com.assemblock.assemblock_be.Entity.Proposal proposal;
 
-    @Column(name = "is_proposer")
-    private boolean isProposer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposer_id", nullable = false)
+    private User proposer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "member_role", nullable = false)
+    private com.assemblock.assemblock_be.Entity.MemberRole memberRole;
+
+    @Column(name = "is_proposer", nullable = false)
+    private Boolean isProposer = false;
+    
+    @Builder
+    public ProjectMember(Project project, User user, Proposal proposal, User proposer, MemberRole memberRole, Boolean isProposer) {
+        this.project = project;
+        this.user = user;
+        this.proposal = proposal;
+        this.proposer = proposer;
+        this.memberRole = memberRole;
+        this.isProposer = isProposer;
+    }
 }
