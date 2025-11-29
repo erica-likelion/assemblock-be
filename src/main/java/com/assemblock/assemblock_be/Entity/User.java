@@ -148,4 +148,35 @@ public class User extends BaseTimeEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @Converter
+    public static class MemberRoleSetConverter implements AttributeConverter<Set<MemberRole>, String> {
+        @Override
+        public String convertToDatabaseColumn(Set<MemberRole> attribute) {
+            if (attribute == null || attribute.isEmpty()) {
+                return "";
+            }
+            return attribute.stream()
+                    .map(MemberRole::name)
+                    .collect(Collectors.joining(","));
+        }
+
+        @Override
+        public Set<MemberRole> convertToEntityAttribute(String dbData) {
+            if (dbData == null || dbData.isBlank()) {
+                return new HashSet<>();
+            }
+            return Arrays.stream(dbData.split(","))
+                    .map(MemberRole::valueOf)
+                    .collect(Collectors.toSet());
+        }
+    }
+
+    public void increaseReviewSentCnt() {
+        this.reviewSentCnt++;
+    }
+
+    public void increaseReviewReceivedCnt() {
+        this.reviewReceivedCnt++;
+    }
 }

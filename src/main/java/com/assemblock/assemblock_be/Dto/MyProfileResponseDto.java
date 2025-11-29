@@ -1,37 +1,39 @@
 package com.assemblock.assemblock_be.Dto;
 
 import com.assemblock.assemblock_be.Entity.MemberRole;
+import com.assemblock.assemblock_be.Entity.ProfileType;
 import com.assemblock.assemblock_be.Entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.Set;
 
 @Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MyProfileResponseDto {
     private String nickname;
-    private String profileImageUrl;
+    private ProfileType profileType;
     private String portfolioUrl;
     private String introduction;
-    private MemberRole mainRole;
+    private Set<MemberRole> mainRoles;
     private String portfolioPdfUrl;
-
-    @Builder
-    public MyProfileResponseDto(String nickname, String profileImageUrl, String portfolioUrl, String introduction, MemberRole mainRole, String portfolioPdfUrl) {
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-        this.portfolioUrl = portfolioUrl;
-        this.introduction = introduction;
-        this.mainRole = mainRole;
-        this.portfolioPdfUrl = portfolioPdfUrl;
-    }
+    private Integer reviewSentCnt;
+    private Integer reviewReceivedCnt;
 
     public static MyProfileResponseDto fromEntity(User user) {
         return MyProfileResponseDto.builder()
                 .nickname(user.getNickname())
-                .profileImageUrl(user.getProfileImageUrl())
+                .profileType(user.getProfileType())
                 .portfolioUrl(user.getPortfolioUrl())
                 .introduction(user.getIntroduction())
-                .mainRole(user.getMainRole())
+                .mainRoles(user.getMainRoles())
                 .portfolioPdfUrl(user.getPortfolioPdfUrl())
+                .reviewSentCnt(user.getReviewSentCnt())
+                .reviewReceivedCnt(user.getReviewReceivedCnt())
                 .build();
     }
 }
