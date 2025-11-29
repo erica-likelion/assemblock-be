@@ -14,4 +14,3 @@ public interface BoardBlockRepository extends JpaRepository<BoardBlock, Long> {
     List<BoardBlock> findTop4ByBoardOrderByCreatedAtDesc(Board board);
     void deleteByBoardAndBlockIn(Board board, List<Block> blocks);
 }
-

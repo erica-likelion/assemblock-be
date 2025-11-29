@@ -22,12 +22,16 @@ public class NotificationService {
     private final ProposalTargetRepository proposalTargetRepository;
 
     public List<NotificationResponseDto> getPendingNotifications(Long currentUserId) {
-        User user = userRepository.findById(currentUserId).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        List<Block> myBlocks = blockRepository.findByUser(user);
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        List<Block> myBlocks = blockRepository.findAllByUser(user);
         if (myBlocks.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ProposalTarget> targets = proposalTargetRepository.findByProposalBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+
         return targets.stream()
                 .map(ProposalTarget::getProposal)
                 .distinct()
@@ -35,10 +39,11 @@ public class NotificationService {
                     User sender = proposal.getProposer();
                     long blockCount = proposalTargetRepository.countByProposal(proposal);
                     String content = proposal.getProjectTitle() + " (" + blockCount + "개 블록 제안)";
+
                     return NotificationResponseDto.builder()
                             .proposalId(proposal.getId())
                             .senderName(sender.getNickname())
-                            .senderProfileImageUrl(sender.getProfileImageUrl())
+                            .senderProfileType(sender.getProfileType()) // DTO 필드 변경 반영
                             .content(content)
                             .build();
                 })
@@ -58,7 +63,7 @@ public class NotificationService {
     private void updateProposalTargetsStatus(Long currentUserId, Long proposalId, ProposalStatus newStatus)
             throws AccessDeniedException {
 
-        List<ProposalTarget> targets = proposalTargetRepository.findByProposalId(proposalId);
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalId(proposalId);
 
         if (targets.isEmpty()) {
             throw new IllegalArgumentException("제안을 찾을 수 없습니다.");

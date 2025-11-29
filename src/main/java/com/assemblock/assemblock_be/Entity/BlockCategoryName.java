@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 @Getter
 public enum BlockCategoryName {
-    프론트엔드("프론트엔드"),
     데이터_시각화("데이터 시각화"),
     API_연동("API 연동"),
     레이아웃_그리드("레이아웃/그리드"),
@@ -17,9 +16,14 @@ public enum BlockCategoryName {
     성능_최적화("성능 최적화"),
     백엔드("백엔드"),
     AI_기능_활용("AI 기능 활용"),
-    디자인("디자인");
+    UXUI디자인("UXUI디자인"),
+    비주얼_그래픽_디자인("비주얼 그래픽 디자인"),
+    브랜드_디자인("브랜드 디자인"),
+    아이콘_디자인("아이콘 디자인"),
+    인터랙션_및_모션_디자인("인터랙션 및 모션 디자인");
 
     private final String dbValue;
+
     BlockCategoryName(String dbValue) {
         this.dbValue = dbValue;
     }
