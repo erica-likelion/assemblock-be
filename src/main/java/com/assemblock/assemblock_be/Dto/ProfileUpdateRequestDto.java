@@ -1,7 +1,6 @@
 package com.assemblock.assemblock_be.Dto;
 
 import com.assemblock.assemblock_be.Entity.MemberRole;
-import com.assemblock.assemblock_be.Entity.ProfileType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

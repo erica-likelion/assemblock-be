@@ -5,7 +5,7 @@ package com.assemblock.assemblock_be.Controller;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.SearchDto;
 import com.assemblock.assemblock_be.Service.SearchService;
-import com.assemblock.assemblock_be.security.UserDetailsImpl;
+import com.assemblock.assemblock_be.Security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

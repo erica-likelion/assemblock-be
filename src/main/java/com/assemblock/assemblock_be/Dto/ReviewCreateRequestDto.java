@@ -1,6 +1,6 @@
-package com.assemblock.assemblock_be.Dto.review;
+package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.ReviewStatus;
+import com.assemblock.assemblock_be.Entity.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -17,5 +17,5 @@ public class ReviewCreateRequestDto {
     private Long reviewerId;      // 리뷰를 남기는 사람
     private Long reviewedUserId;  // 리뷰를 받는 사람
     private Long projectId;       // 함께 했던 프로젝트 id
-    private ReviewStatus reviewStatus; // good / notbad / disappoint
+    private ReviewRating reviewRating; // good / notbad / disappoint
 }

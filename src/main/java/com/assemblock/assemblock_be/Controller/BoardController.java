@@ -4,7 +4,7 @@ package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BoardDto;
 import com.assemblock.assemblock_be.Service.BoardService;
-import com.assemblock.assemblock_be.security.UserDetailsImpl;
+import com.assemblock.assemblock_be.Security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

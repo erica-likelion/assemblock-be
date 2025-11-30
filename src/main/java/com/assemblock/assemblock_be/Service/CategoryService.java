@@ -3,7 +3,6 @@ package com.assemblock.assemblock_be.Service;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.CategoryResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.BlockCategoryName;
 import com.assemblock.assemblock_be.Entity.BlockType;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
 import lombok.RequiredArgsConstructor;

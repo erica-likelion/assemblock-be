@@ -1,4 +1,4 @@
-package com.assemblock.assemblock_be.Dto.project;
+package com.assemblock.assemblock_be.Dto;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal; // 카카오로그인 구현 후 수정
-import com.assemblock.assemblock_be.security.UserDetailsImpl; // 카카오로그인 구현 후 수정
+import com.assemblock.assemblock_be.Security.UserDetailsImpl; // 카카오로그인 구현 후 수정
 
 import java.util.List;
 import java.util.Map;

@@ -2,7 +2,6 @@ package com.assemblock.assemblock_be.Dto;
 
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.BlockType;
-import com.assemblock.assemblock_be.Entity.ProfileType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

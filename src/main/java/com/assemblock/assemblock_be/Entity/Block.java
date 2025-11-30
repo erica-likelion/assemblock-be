@@ -1,7 +1,9 @@
 package com.assemblock.assemblock_be.Entity;
 
-import com.assemblock.assemblock_be.ProposalTarget;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Check;
 import org.hibernate.annotations.CreationTimestamp;
@@ -45,7 +47,9 @@ public class Block extends BaseTimeEntity {
 
     @Check(constraints = "contribution_score >= 0 AND contribution_score <= 10")
     @Column(name = "contribution_score", nullable = false)
-    private Byte contributionScore;
+    private @NotNull(message = "기여도는 필수입니다.")
+    @Min(0)
+    @Max(10) Integer contributionScore;
 
     @Column(name = "tools_text", columnDefinition = "TEXT")
     private String toolsText;
