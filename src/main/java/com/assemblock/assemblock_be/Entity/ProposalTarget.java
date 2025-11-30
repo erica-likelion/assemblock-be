@@ -34,5 +34,5 @@ public class ProposalTarget {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "response_status", nullable = false)
-    private Status responseStatus = Status.pending;
+    private ProposalStatus responseStatus = ProposalStatus.pending;
 }

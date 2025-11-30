@@ -1,7 +1,6 @@
 package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.BlockType;
+import com.assemblock.assemblock_be.Entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +15,7 @@ public class BlockResponseDto {
     private String title;
     private String onelineSummary;
     private String nickname;
-    private ProfileType profileType;
+    private UserProfileType profileType;
     private BlockType blockType;
     private String categoryName;
     private Block.TechPart techPart;

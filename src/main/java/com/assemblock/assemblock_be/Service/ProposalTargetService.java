@@ -1,7 +1,6 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Entity.ProposalTarget;
-import com.assemblock.assemblock_be.Entity.ProposalTargetId;
+import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class ProposalTargetService {
                         "ProposalTarget not found. proposalId=" + proposalId + ", blockId=" + proposalBlockId));
 
         // Status enum: accepted / rejected / pending
-        Status newStatus = Status.valueOf(status.toLowerCase()); // 만약 enum이 소문자라면
+        ProposalStatus newStatus = ProposalStatus.valueOf(status.toLowerCase()); // 만약 enum이 소문자라면
         target.setResponseStatus(newStatus);
 
         return proposalTargetRepository.save(target);

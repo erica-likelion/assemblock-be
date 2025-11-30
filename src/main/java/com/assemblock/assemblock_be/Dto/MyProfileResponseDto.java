@@ -1,7 +1,6 @@
 package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.MemberRole;
-import com.assemblock.assemblock_be.Entity.User;
+import com.assemblock.assemblock_be.Entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class MyProfileResponseDto {
     private String nickname;
-    private ProfileType profileType;
+    private UserProfileType profileType;
     private String portfolioUrl;
     private String introduction;
     private Set<MemberRole> mainRoles;

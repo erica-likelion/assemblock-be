@@ -1,8 +1,6 @@
 package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.MemberRole;
-import com.assemblock.assemblock_be.Entity.Review;
-import com.assemblock.assemblock_be.Entity.User;
+import com.assemblock.assemblock_be.Entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class ReviewResponseDto {
     private Long reviewId;
     private String targetUserNickname;
-    private ProfileType targetUserProfileType;
+    private UserProfileType targetUserProfileType;
     private MemberRole targetUserMainRole;
     private String reviewContent;
     private String projectName;
