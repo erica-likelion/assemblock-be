@@ -1,47 +1,48 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Entity.Project;
-import com.assemblock.assemblock_be.Entity.Review;
-import com.assemblock.assemblock_be.Entity.User;
-import com.assemblock.assemblock_be.Repository.ProjectRepository;
-import com.assemblock.assemblock_be.Repository.ReviewRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Repository.*;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReviewService {
+
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
-    public void createReview(Long reviewerId, ReviewRequestDto requestDto) {
-        User reviewer = userRepository.findById(reviewerId)
-                .orElseThrow(() -> new IllegalArgumentException("작성자를 찾을 수 없습니다."));
+    public Review create(Review review) {
+        return reviewRepository.save(review);
+    }
 
-        User reviewedUser = userRepository.findById(requestDto.getReviewedUserId())
-                .orElseThrow(() -> new IllegalArgumentException("대상 사용자를 찾을 수 없습니다."));
+    public Review findById(Long id) {
+        return reviewRepository.findById(id).orElse(null);
+    }
 
-        Project project = projectRepository.findById(requestDto.getProjectId())
-                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
+    public List<Review> findAll() {
+        return reviewRepository.findAll();
+    }
 
-        if (reviewRepository.existsByProjectAndUserAndReviewedUser(project, reviewer, reviewedUser)) {
-            throw new IllegalStateException("이미 해당 사용자에게 리뷰를 작성했습니다.");
-        }
+    public void delete(Long id) {
+        reviewRepository.deleteById(id);
+    }
 
-        Review review = Review.builder()
-                .user(reviewer)
-                .reviewedUser(reviewedUser)
-                .project(project)
-                .review(requestDto.getRating())
-                .build();
+    public Review writeReview(Long reviewerId, Long reviewedUserId, Long projectId, String text) {
 
-        reviewRepository.save(review);
+        Project p = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트 없음"));
 
-        reviewer.increaseReviewSentCnt();
-        reviewedUser.increaseReviewReceivedCnt();
+        Review review = new Review();
+        review.setReviewer(new User(reviewerId));
+        review.setReviewedUser(new User(reviewedUserId));
+        review.setProject(p);
+        review.setReviewStatus(ReviewStatus.valueOf(text));
+
+
+        return reviewRepository.save(review);
     }
 }

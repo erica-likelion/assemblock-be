@@ -3,7 +3,7 @@ package com.assemblock.assemblock_be.Service;
 import com.assemblock.assemblock_be.Entity.ProposalTarget;
 import com.assemblock.assemblock_be.Entity.ProposalTargetId;
 import com.assemblock.assemblock_be.Entity.Status;
-import com.assemblock.assemblock_be.Repository.ProposalTargetRepository;
+import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ProposalTargetService {
+
     private final ProposalTargetRepository proposalTargetRepository;
 
     @Transactional
@@ -21,12 +22,9 @@ public class ProposalTargetService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "ProposalTarget not found. proposalId=" + proposalId + ", blockId=" + proposalBlockId));
 
-        try {
-            Status newStatus = Status.valueOf(status.toLowerCase());
-            target.setResponseStatus(newStatus);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("잘못된 상태 값입니다: " + status);
-        }
+        // Status enum: accepted / rejected / pending
+        Status newStatus = Status.valueOf(status.toLowerCase()); // 만약 enum이 소문자라면
+        target.setResponseStatus(newStatus);
 
         return proposalTargetRepository.save(target);
     }

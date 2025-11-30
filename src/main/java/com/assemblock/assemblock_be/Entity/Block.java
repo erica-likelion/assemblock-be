@@ -17,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "Block")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Block extends BaseTimeEntity {
 
     @Id
