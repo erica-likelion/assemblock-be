@@ -3,22 +3,23 @@ package com.assemblock.assemblock_be.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import com.assemblock.assemblock_be.Entity.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 @Table(name = "Proposal_target")
 public class ProposalTarget {
+
     @EmbeddedId
-    private com.assemblock.assemblock_be.Entity.ProposalTargetId id;
+    private ProposalTargetId id;
 
     @JsonIgnore
     @MapsId("proposalId")
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id")
-    private Proposal proposal_id;
+    private Proposal proposal;
 
     @JsonIgnore
     @MapsId("proposalBlockId")

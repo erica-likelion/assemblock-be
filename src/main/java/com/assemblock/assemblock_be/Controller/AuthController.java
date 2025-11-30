@@ -17,10 +17,10 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/kakao")
-    public ResponseEntity<AuthResponse> kakaoLogin(
+    public ResponseEntity<AuthResponseDto> kakaoLogin(
             @RequestBody KakaoLoginDto requestDto
     ) {
-        AuthResponse responseDto = authService.kakaoLogin(requestDto.getAuthorizationCode());
+        AuthResponseDto responseDto = authService.kakaoLogin(requestDto.getAuthorizationCode());
         return ResponseEntity.ok(responseDto);
     }
 
@@ -36,10 +36,10 @@ public class AuthController {
 
     // 토큰 재발급
     @PostMapping("/refresh")
-    public ResponseEntity<TokenRefreshResponse> refreshAccessToken(
+    public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
             @Valid @RequestBody TokenRefreshDto requestDto
     ) {
-        TokenRefreshResponse responseDto = authService.refreshAccessToken(requestDto.getRefreshToken());
+        TokenRefreshResponseDto responseDto = authService.refreshAccessToken(requestDto.getRefreshToken());
         return ResponseEntity.ok(responseDto);
     }
 }

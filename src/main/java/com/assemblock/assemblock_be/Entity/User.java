@@ -1,11 +1,5 @@
 package com.assemblock.assemblock_be.Entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 import com.assemblock.assemblock_be.Dto.SignupDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,12 +8,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "User")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTimeEntity implements UserDetails {
+public class User extends BaseTime implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,22 +84,28 @@ public class User extends BaseTimeEntity implements UserDetails {
         this.isPublishing = true;
     }
 
-    /**
-     * 2단계 회원가입
-     */
     public void completeProfile(SignupDto dto) {
         this.nickname = dto.getNickname();
         this.roles = new ArrayList<>(dto.getRoles());
-
-        this.profileType = UserProfileType.values()[dto.getProfileImageIndex() - 1];
-
+        this.profileType = dto.getUserProfileType();
         this.introduction = dto.getIntroduction();
         this.portfolioUrl = dto.getPortfolioUrl();
         this.portfolioPdfUrl = dto.getPortfolioPdfUrl();
-
         this.isProfileComplete = true;
     }
-    
+
+    public void updateProfile(String nickname, String portfolioUrl, String introduction,
+                              List<Role> roles, UserProfileType profileType, String portfolioPdfUrl) {
+        this.nickname = nickname;
+        this.portfolioUrl = portfolioUrl;
+        this.introduction = introduction;
+        if (roles != null) {
+            this.roles = new ArrayList<>(roles);
+        }
+        this.profileType = profileType;
+        this.portfolioPdfUrl = portfolioPdfUrl;
+    }
+
     public void increaseReviewSentCnt() {
         this.reviewSentCnt++;
     }
@@ -147,36 +149,5 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Converter
-    public static class MemberRoleSetConverter implements AttributeConverter<Set<MemberRole>, String> {
-        @Override
-        public String convertToDatabaseColumn(Set<MemberRole> attribute) {
-            if (attribute == null || attribute.isEmpty()) {
-                return "";
-            }
-            return attribute.stream()
-                    .map(MemberRole::name)
-                    .collect(Collectors.joining(","));
-        }
-
-        @Override
-        public Set<MemberRole> convertToEntityAttribute(String dbData) {
-            if (dbData == null || dbData.isBlank()) {
-                return new HashSet<>();
-            }
-            return Arrays.stream(dbData.split(","))
-                    .map(MemberRole::valueOf)
-                    .collect(Collectors.toSet());
-        }
-    }
-
-    public void increaseReviewSentCnt() {
-        this.reviewSentCnt++;
-    }
-
-    public void increaseReviewReceivedCnt() {
-        this.reviewReceivedCnt++;
     }
 }

@@ -31,7 +31,7 @@ public class AuthService {
 
 
     @Transactional
-    public AuthResponse kakaoLogin(String authorizationCode) {
+    public AuthResponseDto kakaoLogin(String authorizationCode) {
 
         String kakaoAccessToken = getKakaoAccessToken(authorizationCode);
         Long kakaoId = getKakaoUserId(kakaoAccessToken);
@@ -52,7 +52,7 @@ public class AuthService {
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        return new AuthResponse(
+        return new AuthResponseDto(
                 accessToken,
                 refreshToken,
                 isNewUser,
@@ -71,7 +71,7 @@ public class AuthService {
      * (신규) 액세스 토큰 재발급
      */
     @Transactional
-    public TokenRefreshResponse refreshAccessToken(String refreshToken) {
+    public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new JwtException("Invalid Refresh Token");
         }
@@ -83,7 +83,7 @@ public class AuthService {
 
         String newAccessToken = jwtTokenProvider.createAccessToken(user.getId());
 
-        return new TokenRefreshResponse(newAccessToken, refreshToken);
+        return new TokenRefreshResponseDto(newAccessToken, refreshToken);
     }
 
     private String getKakaoAccessToken(String code) {

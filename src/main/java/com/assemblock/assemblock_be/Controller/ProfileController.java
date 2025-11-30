@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.BlockResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
 import com.assemblock.assemblock_be.Service.ProfileService;
@@ -25,11 +25,11 @@ public class ProfileController {
     }
 
     @GetMapping("/{userId}/blocks")
-    public ResponseEntity<List<BlockResponse>> getPublicBlocks(
+    public ResponseEntity<List<BlockResponseDto>> getPublicBlocks(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "ALL") String type
     ) {
-        List<BlockResponse> blocks = profileService.getPublicBlocks(userId, type);
+        List<BlockResponseDto> blocks = profileService.getPublicBlocks(userId, type);
         return ResponseEntity.ok(blocks);
     }
 

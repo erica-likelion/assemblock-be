@@ -1,9 +1,9 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BoardDto;
-import com.assemblock.assemblock_be.Dto.BoardListResponse;
-import com.assemblock.assemblock_be.Service.BoardService;
+import com.assemblock.assemblock_be.Dto.BoardListResponseDto;
 import com.assemblock.assemblock_be.Entity.User;
+import com.assemblock.assemblock_be.Service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,52 +23,57 @@ import java.util.Map;
 public class BoardController {
     private final BoardService boardService;
 
+    // 1. 내 보드 목록 조회
     @GetMapping
-    public ResponseEntity<List<BoardListResponse>> getMyBoards(
+    public ResponseEntity<List<BoardListResponseDto>> getMyBoards(
             @AuthenticationPrincipal User user
     ) {
-        Long userId = user.getId();
-        List<BoardListResponse> boards = boardService.getBoardList(userId);
+        List<BoardListResponseDto> boards = boardService.getMyBoards(user.getId());
         return ResponseEntity.ok(boards);
     }
 
+    // 2. 보드 생성
     @PostMapping
     public ResponseEntity<Void> createBoard(
             @AuthenticationPrincipal User user,
-            @Valid @RequestBody BoardDto request
+            @Valid @RequestBody BoardDto.BoardCreateRequest request
     ) {
-        Long boardId = boardService.createBoard(user.getId(), request);
-        // 생성된 리소스 URI 반환 (201 Created)
-        return ResponseEntity.created(URI.create("/api/boards/" + boardId)).build();
+        BoardDto.BoardDetailResponse response = boardService.createBoard(user.getId(), request);
+        return ResponseEntity.created(URI.create("/api/boards/" + response.getBoardId())).build();
     }
 
+    // 3. 보드 상세 조회
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> getBoardDetails(
+            @AuthenticationPrincipal User user,
             @PathVariable Long boardId
     ) {
-        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetail(boardId);
+        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetails(user.getId(), boardId);
         return ResponseEntity.ok(boardDetail);
     }
 
+    // 4. 보드 수정
     @PutMapping("/{boardId}")
     public ResponseEntity<Void> updateBoard(
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
-            @Valid @RequestBody BoardDto request
+            @Valid @RequestBody BoardDto.BoardUpdateRequest request
     ) {
         boardService.updateBoard(user.getId(), boardId, request);
         return ResponseEntity.ok().build();
     }
 
+    // 5. 보드 삭제
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId
     ) {
         boardService.deleteBoard(user.getId(), boardId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+        return ResponseEntity.noContent().build();
     }
 
+    // 6. 보드에 블록 추가
     @PostMapping("/{boardId}/blocks")
     public ResponseEntity<Void> addBlockToBoard(
             @AuthenticationPrincipal User user,
@@ -82,16 +88,26 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // --- 7. 블록 제거 (DELETE /api/v1/boards/{boardId}/blocks/{blockId}) ---
+    // 7. 보드에서 블록 제거
     @DeleteMapping("/{boardId}/blocks/{blockId}")
     public ResponseEntity<Void> removeBlockFromBoard(
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
             @PathVariable Long blockId
     ) {
-        boardService.removeBlockFromBoard(user.getId(), boardId, blockId);
+        boardService.removeBlocksFromBoard(user.getId(), boardId, Collections.singletonList(blockId));
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/proposals")
+    public ResponseEntity<Void> createTeamProposal(
+            @AuthenticationPrincipal User user,
+            @RequestBody BoardDto.TeamProposalRequest requestDto
+    ) {
+        boardService.createTeamProposal(user.getId(), requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {

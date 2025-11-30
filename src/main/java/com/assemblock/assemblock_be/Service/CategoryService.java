@@ -23,30 +23,30 @@ public class CategoryService {
             List<Block> blocksInThisPart = blockRepository.findAllByTechPart(techPart);
 
             List<String> subCategories = blocksInThisPart.stream()
-                    .map(Block::getCategory)
+                    .map(Block::getCategoryName)
                     .filter(Objects::nonNull)
                     .distinct()
-                    .map(BlockCategory::getDbValue)
+                    .map(Enum::name)
                     .collect(Collectors.toList());
 
             return new CategoryResponseDto(techPart, subCategories);
         }).collect(Collectors.toList());
     }
 
-    public List<BlockResponse> getBlocks(String category, String type) {
+    public List<BlockResponseDto> getBlocks(String category, String type) {
         List<Block> blocks;
 
         if (category != null && !category.isBlank()) {
-            Block.BlockCategory categoryEnum = Arrays.stream(BlockCategory.values())
-                    .filter(c -> c.name().equals(category) || c.getDbValue().equals(category))
+            Block.BlockCategory categoryEnum = Arrays.stream(Block.BlockCategory.values())
+                    .filter(c -> c.name().equals(category))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + category));
 
-            blocks = blockRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum);
+            blocks = blockRepository.findAllByCategoryNameOrderByCreatedAtDesc(categoryEnum);
 
         } else if (type != null && !type.isBlank()) {
             try {
-                BlockType blockType = BlockType.valueOf(type.toUpperCase());
+                Block.BlockType blockType = Block.BlockType.valueOf(type.toUpperCase());
                 blocks = blockRepository.findAllByBlockTypeOrderByCreatedAtDesc(blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);
@@ -56,7 +56,7 @@ public class CategoryService {
         }
 
         return blocks.stream()
-                .map(BlockResponse::fromEntity)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 }

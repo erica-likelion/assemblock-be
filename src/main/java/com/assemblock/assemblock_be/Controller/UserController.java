@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.UserResponse;
+import com.assemblock.assemblock_be.Dto.UserResponseDto;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +22,11 @@ public class UserController {
      * (헤더의 JWT 토큰을 바탕으로 인증)
      */
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getMyProfile(
+    public ResponseEntity<UserResponseDto> getMyProfile(
             @AuthenticationPrincipal User user
     ) {
         Long currentUserId = user.getId();
-        UserResponse response = userService.getMyProfile(currentUserId);
+        UserResponseDto response = userService.getMyProfile(currentUserId);
         return ResponseEntity.ok(response);
     }
 }

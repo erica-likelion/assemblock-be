@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class ProposalResponseDto {
-
     private Long proposalId;
     private Long proposerId;
     private String discordId;

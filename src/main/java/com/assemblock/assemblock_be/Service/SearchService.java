@@ -20,7 +20,7 @@ public class SearchService {
     private final UserRepository userRepository;
 
     @Transactional
-    public List<BlockResponse> searchBlocks(Long userId, String keyword) {
+    public List<BlockResponseDto> searchBlocks(Long userId, String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return Collections.emptyList();
         }
@@ -36,7 +36,7 @@ public class SearchService {
         List<Block> blocks = blockRepository.findByKeyword(keyword);
 
         return blocks.stream()
-                .map(BlockResponse::fromEntity)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 

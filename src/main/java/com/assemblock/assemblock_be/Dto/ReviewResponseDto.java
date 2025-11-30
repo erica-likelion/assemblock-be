@@ -14,13 +14,16 @@ public class ReviewResponseDto {
     private Long reviewId;
     private String targetUserNickname;
     private UserProfileType targetUserProfileType;
-    private MemberRole targetUserMainRole;
+    private Role targetUserMainRole;
     private String reviewContent;
     private String projectName;
     private String memberRole;
 
     public static ReviewResponseDto fromEntity(Review review, User targetUser, String projectRole) {
-        MemberRole mainRole = targetUser.getMainRoles().stream().findFirst().orElse(MemberRole.BackEnd);
+
+        Role mainRole = targetUser.getRoles().stream()
+                .findFirst()
+                .orElse(null);
 
         return ReviewResponseDto.builder()
                 .reviewId(review.getId())

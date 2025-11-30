@@ -1,6 +1,5 @@
 package com.assemblock.assemblock_be.Entity;
 
-import com.assemblock.assemblock_be.ProposalTarget;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

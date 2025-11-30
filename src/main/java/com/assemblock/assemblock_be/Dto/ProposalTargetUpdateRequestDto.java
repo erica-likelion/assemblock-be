@@ -12,7 +12,6 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 public class ProposalTargetUpdateRequestDto {
-
-    private String status;  // accepted / rejected / pending
+    private String status;
 }
 

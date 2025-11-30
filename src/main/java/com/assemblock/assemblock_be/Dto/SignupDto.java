@@ -5,11 +5,17 @@ import com.assemblock.assemblock_be.Entity.UserProfileType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.List;
 
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignupDto {
 
     @NotBlank(message = "닉네임은 필수입니다.")
@@ -17,7 +23,7 @@ public class SignupDto {
     private String nickname;
 
     @NotNull(message = "역할은 최소 1개 이상 선택해야 합니다.")
-    private Role roles;
+    private List<Role> roles;
 
     @NotNull(message = "프로필 이미지를 선택해야 합니다.")
     private UserProfileType userProfileType;

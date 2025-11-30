@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Builder
@@ -17,7 +17,7 @@ public class MyProfileResponseDto {
     private UserProfileType profileType;
     private String portfolioUrl;
     private String introduction;
-    private Set<MemberRole> mainRoles;
+    private List<Role> mainRoles;
     private String portfolioPdfUrl;
     private Integer reviewSentCnt;
     private Integer reviewReceivedCnt;
@@ -28,7 +28,7 @@ public class MyProfileResponseDto {
                 .profileType(user.getProfileType())
                 .portfolioUrl(user.getPortfolioUrl())
                 .introduction(user.getIntroduction())
-                .mainRoles(user.getMainRoles())
+                .mainRoles(user.getRoles())
                 .portfolioPdfUrl(user.getPortfolioPdfUrl())
                 .reviewSentCnt(user.getReviewSentCnt())
                 .reviewReceivedCnt(user.getReviewReceivedCnt())

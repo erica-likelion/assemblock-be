@@ -1,16 +1,16 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.BlockResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ProfileUpdateRequestDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
-import com.assemblock.assemblock_be.Service.MyPageService;
 import com.assemblock.assemblock_be.Entity.User;
+import com.assemblock.assemblock_be.Service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -20,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
 public class MyPageController {
+
     private final MyPageService myPageService;
 
     @GetMapping("/profile")
@@ -42,12 +43,12 @@ public class MyPageController {
     }
 
     @GetMapping("/blocks")
-    public ResponseEntity<List<BlockResponse>> getMyBlocks(
+    public ResponseEntity<List<BlockResponseDto>> getMyBlocks(
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "ALL") String type
     ) {
         Long currentUserId = user.getId();
-        List<BlockResponse> blocks = myPageService.getMyBlocks(currentUserId, type);
+        List<BlockResponseDto> blocks = myPageService.getMyBlocks(currentUserId, type);
         return ResponseEntity.ok(blocks);
     }
 
@@ -66,7 +67,7 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file
     ) {
-        String fileUrl = myPageService.uploadFile(user.getId(), file);
+        String fileUrl = myPageService.uploadFile(file);
         return ResponseEntity.ok(Map.of("fileUrl", fileUrl));
     }
 }

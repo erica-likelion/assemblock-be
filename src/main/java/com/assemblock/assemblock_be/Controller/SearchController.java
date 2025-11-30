@@ -1,8 +1,6 @@
-// 카카오 로그인 구현 후 수정
-
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.BlockResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.SearchDto;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.SearchService;
@@ -20,12 +18,12 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping("/blocks")
-    public ResponseEntity<List<BlockResponse>> searchBlocksByKeyword(
+    public ResponseEntity<List<BlockResponseDto>> searchBlocksByKeyword(
             @AuthenticationPrincipal User user,
             @RequestParam("q") String keyword
     ) {
         Long userId = user.getId();
-        List<BlockResponse> result = searchService.searchBlocks(userId, keyword);
+        List<BlockResponseDto> result = searchService.searchBlocks(userId, keyword);
         return ResponseEntity.ok(result);
     }
 

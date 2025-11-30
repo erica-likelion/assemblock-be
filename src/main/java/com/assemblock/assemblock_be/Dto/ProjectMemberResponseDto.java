@@ -12,7 +12,6 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 public class ProjectMemberResponseDto {
-
     private Long memberId;
     private Long projectId;
     private Long userId;

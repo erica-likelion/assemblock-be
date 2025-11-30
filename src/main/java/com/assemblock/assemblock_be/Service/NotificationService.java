@@ -6,6 +6,7 @@ import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.nio.file.AccessDeniedException;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ public class NotificationService {
             return Collections.emptyList();
         }
 
-        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
 
         return targets.stream()
                 .map(ProposalTarget::getProposal)
@@ -41,7 +42,7 @@ public class NotificationService {
                     return NotificationResponseDto.builder()
                             .proposalId(proposal.getId())
                             .senderName(sender.getNickname())
-                            .senderProfileType(sender.getProfileType()) // DTO 필드 변경 반영
+                            .senderProfileType(sender.getProfileType())
                             .content(content)
                             .build();
                 })
@@ -60,15 +61,15 @@ public class NotificationService {
 
     private void updateProposalTargetsStatus(Long currentUserId, Long proposalId, ProposalStatus newStatus)
             throws AccessDeniedException {
-
-        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposalId(proposalId);
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByProposal_Id(proposalId);
 
         if (targets.isEmpty()) {
             throw new IllegalArgumentException("제안을 찾을 수 없습니다.");
         }
 
         for (ProposalTarget target : targets) {
-            Long blockOwnerId = target.getProposalBlock().getUser().getId();
+            Long blockOwnerId = target.getBlock().getUser().getId();
+
             if (!blockOwnerId.equals(currentUserId)) {
                 throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");
             }

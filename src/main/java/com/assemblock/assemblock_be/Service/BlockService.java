@@ -1,9 +1,9 @@
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
-import com.assemblock.assemblock_be.Dto.BlockResponse;
-import com.assemblock.assemblock_be.Dto.BlockListResponse;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockPagingResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
@@ -36,7 +36,13 @@ public class BlockService {
 
         Block block = Block.builder()
                 .user(user)
-                .dto(requestDto)
+                .blockTitle(requestDto.getBlockTitle())
+                .categoryName(requestDto.getCategoryName())
+                .techPart(requestDto.getTechPart())
+                .blockType(requestDto.getBlockType())
+                .contributionScore(requestDto.getContributionScore())
+                .toolsText(requestDto.getToolsText())
+                .oneLineSummary(requestDto.getOneLineSummary())
                 .build();
 
         blockRepository.save(block);
@@ -45,11 +51,11 @@ public class BlockService {
     }
 
     @Transactional(readOnly = true)
-    public BlockResponse getBlockDetail(Long blockId) {
+    public BlockResponseDto getBlockDetail(Long blockId) {
         Block block = blockRepository.findById(blockId)
                 .orElseThrow(() -> new IllegalArgumentException("Block not found"));
 
-        return new BlockResponse(block);
+        return new BlockResponseDto(block);
     }
 
     @Transactional
@@ -89,7 +95,7 @@ public class BlockService {
     }
 
     @Transactional(readOnly = true)
-    public BlockPagingResponse<BlockListResponse> getBlockList(
+    public BlockPagingResponseDto<BlockListResponseDto> getBlockList(
             Optional<Block.BlockCategory> category,
             Optional<Block.TechPart> techPart,
             String keyword,
@@ -110,8 +116,8 @@ public class BlockService {
             blockPage = blockRepository.findAllByBlockTitleContaining(finalKeyword, pageable);
         }
 
-        Page<BlockListResponse> dtoPage = blockPage.map(BlockListResponse::new);
+        Page<BlockListResponseDto> dtoPage = blockPage.map(BlockListResponseDto::new);
 
-        return new BlockPagingResponse<>(dtoPage);
+        return new BlockPagingResponseDto<>(dtoPage);
     }
 }

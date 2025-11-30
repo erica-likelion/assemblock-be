@@ -23,24 +23,14 @@ public class BoardService {
     private final ProposalRepository proposalRepository;
     private final ProposalTargetRepository proposalTargetRepository;
 
-    public List<BoardDto.BoardSummaryResponse> getMyBoards(Long userId) {
+    public List<BoardListResponseDto> getMyBoards(Long userId) {
         User user = findUserById(userId);
         List<Board> boards = boardRepository.findAllByUser(user);
+
         return boards.stream()
                 .map(board -> {
-                    long blockCount = boardBlockRepository.countByBoard(board);
-                    List<String> previewTypes = boardBlockRepository.findTop4ByBoardOrderByCreatedAtDesc(board)
-                            .stream()
-                            .map(boardBlock -> boardBlock.getBlock().getTechPart() != null ?
-                                    boardBlock.getBlock().getTechPart().name() : "IDEA")
-                            .collect(Collectors.toList());
-
-                    return BoardDto.BoardSummaryResponse.builder()
-                            .boardId(board.getId())
-                            .boardName(board.getBoardName())
-                            .blockCount((int) blockCount)
-                            .previewTypes(previewTypes)
-                            .build();
+                    int blockCount = (int) boardBlockRepository.countByBoard(board);
+                    return new BoardListResponseDto(board, blockCount);
                 })
                 .collect(Collectors.toList());
     }
@@ -138,6 +128,7 @@ public class BoardService {
             ProposalTarget target = ProposalTarget.builder()
                     .proposal(proposal)
                     .proposer(proposer)
+                    .block(block)
                     .responseStatus(ProposalStatus.pending)
                     .build();
             proposalTargetRepository.save(target);
@@ -161,10 +152,10 @@ public class BoardService {
     }
 
     private BoardDto.BoardDetailResponse boardToDetailResponse(Board board) {
-        List<BlockResponse> blocksInBoard = boardBlockRepository.findAllByBoard(board)
+        List<BlockResponseDto> blocksInBoard = boardBlockRepository.findAllByBoard(board)
                 .stream()
                 .map(BoardBlock::getBlock)
-                .map(BlockResponse::fromEntity)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
 
         return BoardDto.BoardDetailResponse.builder()
@@ -175,4 +166,3 @@ public class BoardService {
                 .build();
     }
 }
-

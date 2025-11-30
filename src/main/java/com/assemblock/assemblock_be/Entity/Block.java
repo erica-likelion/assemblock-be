@@ -6,12 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Check;
-import org.hibernate.annotations.CreationTimestamp;
 import com.assemblock.assemblock_be.Dto.BlockDto;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -19,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "Block")
-public class Block extends BaseTimeEntity {
+public class Block extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -89,7 +84,6 @@ public class Block extends BaseTimeEntity {
         this.oneLineSummary = dto.getOneLineSummary();
     }
 
-    // --- ▽ 수정 메서드 (Update) ▽ ---
     public void update(BlockDto dto) {
         this.techPart = dto.getTechPart();
         this.categoryName = dto.getCategoryName();

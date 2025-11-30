@@ -1,9 +1,9 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
-import com.assemblock.assemblock_be.Dto.BlockResponse;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponse;
-import com.assemblock.assemblock_be.Dto.BlockListResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockPagingResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
@@ -42,10 +42,10 @@ public class BlockController {
      * 2. 블록 상세 조회 (GET)
      */
     @GetMapping("/{blockId}")
-    public ResponseEntity<BlockResponse> getBlockDetail(
+    public ResponseEntity<BlockResponseDto> getBlockDetail(
                                                          @PathVariable Long blockId
     ) {
-        BlockResponse responseDto = blockService.getBlockDetail(blockId);
+        BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
         return ResponseEntity.ok(responseDto);
     }
 
@@ -78,13 +78,13 @@ public class BlockController {
      * 5. 블록 목록 조회/검색 (GET) - 신규
      */
     @GetMapping
-    public ResponseEntity<BlockPagingResponse<BlockListResponse>> getBlockList(
+    public ResponseEntity<BlockPagingResponseDto<BlockListResponseDto>> getBlockList(
             @RequestParam(required = false) Optional<Block.BlockCategory> category,
             @RequestParam(required = false) Optional<Block.TechPart> techPart,
             @RequestParam(required = false) String keyword,
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
     ) {
-        BlockPagingResponse<BlockListResponse> response = blockService.getBlockList(category, techPart, keyword, pageable);
+        BlockPagingResponseDto<BlockListResponseDto> response = blockService.getBlockList(category, techPart, keyword, pageable);
         return ResponseEntity.ok(response);
     }
 }

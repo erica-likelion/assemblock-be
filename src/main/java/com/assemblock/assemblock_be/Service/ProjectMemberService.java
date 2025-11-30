@@ -21,7 +21,6 @@ public class ProjectMemberService {
         projectMemberRepository.deleteById(id);
     }
 
-    // 🔥 추가해야 하는 3개 메서드
     public ProjectMember findById(Long id) {
         return projectMemberRepository.findById(id)
                 .orElse(null);

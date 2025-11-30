@@ -26,7 +26,7 @@ public class ProfileService {
         return MyProfileResponseDto.fromEntity(user);
     }
 
-    public List<BlockResponse> getPublicBlocks(Long userId, String type) {
+    public List<BlockResponseDto> getPublicBlocks(Long userId, String type) {
         User user = findPublicUserById(userId);
         List<Block> blocks;
 
@@ -34,7 +34,7 @@ public class ProfileService {
             blocks = blockRepository.findAllByUser(user);
         } else {
             try {
-                BlockType blockType = BlockType.valueOf(type.toUpperCase());
+                Block.BlockType blockType = Block.BlockType.valueOf(type.toUpperCase());
                 blocks = blockRepository.findAllByUserAndBlockType(user, blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);

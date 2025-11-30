@@ -8,7 +8,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class UserResponse {
+public class UserResponseDto {
 
     private Long userId;
     private String nickname;
@@ -22,7 +22,7 @@ public class UserResponse {
     private Integer reviewReceivedCnt;
     private Boolean isPublishing;
 
-    public UserResponse(User user) {
+    public UserResponseDto(User user) {
         this.userId = user.getId();
         this.nickname = user.getNickname();
         this.roles = user.getRoles();
@@ -30,7 +30,6 @@ public class UserResponse {
         this.profileType = user.getProfileType();
         this.portfolioUrl = user.getPortfolioUrl();
         this.portfolioPdfUrl = user.getPortfolioPdfUrl();
-
         this.reviewSentCnt = user.getReviewSentCnt();
         this.reviewReceivedCnt = user.getReviewReceivedCnt();
         this.isPublishing = user.getIsPublishing();

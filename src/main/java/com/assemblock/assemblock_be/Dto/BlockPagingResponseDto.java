@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 @Getter
-public class BlockPagingResponse<T> {
+public class BlockPagingResponseDto<T> {
     private final List<T> content;
     private final int totalPages;
     private final long totalElements;
@@ -14,7 +14,7 @@ public class BlockPagingResponse<T> {
     private final int pageNumber;
     private final boolean isLast;
 
-    public BlockPagingResponse(Page<T> page) {
+    public BlockPagingResponseDto(Page<T> page) {
         this.content = page.getContent();
         this.totalPages = page.getTotalPages();
         this.totalElements = page.getTotalElements();

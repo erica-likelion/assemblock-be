@@ -1,49 +1,68 @@
 package com.assemblock.assemblock_be.Service;
 
+import com.assemblock.assemblock_be.Dto.ProposalCreateRequestDto;
+import com.assemblock.assemblock_be.Dto.ProposalResponseDto;
 import com.assemblock.assemblock_be.Entity.Proposal;
 import com.assemblock.assemblock_be.Entity.User;
-import com.assemblock.assemblock_be.Repository.*;
-
-import lombok.*;
+import com.assemblock.assemblock_be.Repository.ProposalRepository;
+import com.assemblock.assemblock_be.Repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProposalService {
 
     private final ProposalRepository proposalRepository;
+    private final UserRepository userRepository;
 
-    public Proposal create(Proposal proposal) {
-        return proposalRepository.save(proposal);
+    @Transactional
+    public void createProposal(ProposalCreateRequestDto dto) {
+        User user = userRepository.findById(dto.getProposerId())
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        Proposal proposal = Proposal.builder()
+                .proposer(user)
+                .discordId(dto.getDiscordId())
+                .recruitStartDate(dto.getRecruitStartDate())
+                .recruitEndDate(dto.getRecruitEndDate())
+                .projectTitle(dto.getProjectTitle())
+                .projectMemo(dto.getProjectMemo())
+                .build();
+
+        proposalRepository.save(proposal);
     }
 
-    public Proposal findById(Long id) {
-        return proposalRepository.findById(id).orElse(null);
+    public ProposalResponseDto getProposalDetail(Long id) {
+        Proposal proposal = proposalRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
+
+        return ProposalResponseDto.builder()
+                .proposalId(proposal.getId())
+                .proposerId(proposal.getProposer().getId())
+                .discordId(proposal.getDiscordId())
+                .recruitStartDate(proposal.getRecruitStartDate())
+                .recruitEndDate(proposal.getRecruitEndDate())
+                .projectTitle(proposal.getProjectTitle())
+                .projectMemo(proposal.getProjectMemo())
+                .createdAt(proposal.getCreatedAt())
+                .build();
+    }
+
+    public List<Proposal> getMyProposals(Long userId) {
+        return proposalRepository.findAllByProposer_Id(userId);
     }
 
     public List<Proposal> findAll() {
         return proposalRepository.findAll();
     }
 
+    @Transactional
     public void delete(Long id) {
         proposalRepository.deleteById(id);
-    }
-
-    public Proposal sendProposal(Long proposerId, String discordId,
-                                 LocalDate start, LocalDate end,
-                                 String title, String memo) {
-
-        Proposal p = new Proposal();
-        p.setProposer(new User(proposerId));
-        p.setDiscordId(discordId);
-        p.setRecruitStartDate(start);
-        p.setRecruitEndDate(end);
-        p.setProjectTitle(title);
-        p.setProjectMemo(memo);
-
-        return proposalRepository.save(p);
     }
 }

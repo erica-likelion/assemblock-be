@@ -1,5 +1,3 @@
-// 로그인 구현 후 확인 필요
-
 package com.assemblock.assemblock_be.Repository;
 
 import com.assemblock.assemblock_be.Entity.User;
@@ -9,6 +7,5 @@ import java.util.Optional;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    // 카카오 ID로 사용자를 찾는 메서드
     Optional<User> findByKakaoId(Long kakaoId);
 }

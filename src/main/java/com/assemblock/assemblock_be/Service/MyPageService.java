@@ -1,7 +1,6 @@
-// S3 설정 후 수정
-
 package com.assemblock.assemblock_be.Service;
 
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ProfileUpdateRequestDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
@@ -28,7 +27,6 @@ public class MyPageService {
     private final BlockRepository blockRepository;
     private final ReviewRepository reviewRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    // private final S3Service s3Service;
 
     public MyProfileResponseDto getMyProfile(Long currentUserId) {
         User user = findUserById(currentUserId);
@@ -38,11 +36,19 @@ public class MyPageService {
     @Transactional
     public MyProfileResponseDto updateMyProfile(Long currentUserId, ProfileUpdateRequestDto requestDto) {
         User user = findUserById(currentUserId);
+
+        List<Role> convertedRoles = null;
+        if (requestDto.getMainRoles() != null) {
+            convertedRoles = requestDto.getMainRoles().stream()
+                    .map(memberRole -> Role.valueOf(memberRole.name()))
+                    .collect(Collectors.toList());
+        }
+
         user.updateProfile(
                 requestDto.getNickname(),
                 requestDto.getPortfolioUrl(),
                 requestDto.getIntroduction(),
-                requestDto.getMainRoles(),
+                convertedRoles,
                 requestDto.getProfileType(),
                 requestDto.getPortfolioPdfUrl()
         );
@@ -50,21 +56,17 @@ public class MyPageService {
     }
 
     @Transactional
-    public String uploadFile(Long currentUserId, MultipartFile file) {
-        User user = findUserById(currentUserId);
-
+    public String uploadFile(MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
 
-        // 임시 URL
+        // 임시 URL 로직 (S3 설정 시 실제 로직으로 대체)
         String fileName = file.getOriginalFilename();
-        String mockUrl = "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
-
-        return mockUrl;
+        return "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
     }
 
-    public List<BlockResponse> getMyBlocks(Long currentUserId, String type) {
+    public List<BlockResponseDto> getMyBlocks(Long currentUserId, String type) {
         User user = findUserById(currentUserId);
         List<Block> blocks;
 
@@ -72,7 +74,7 @@ public class MyPageService {
             blocks = blockRepository.findAllByUser(user);
         } else {
             try {
-                BlockType blockType = BlockType.valueOf(type.toUpperCase());
+                Block.BlockType blockType = Block.BlockType.valueOf(type.toUpperCase());
                 blocks = blockRepository.findAllByUserAndBlockType(user, blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);
@@ -80,7 +82,7 @@ public class MyPageService {
         }
 
         return blocks.stream()
-                .map(BlockResponse::fromEntity)
+                .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
