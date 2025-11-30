@@ -1,16 +1,18 @@
-// 카카오로그인 구현 후 수정
-
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BoardDto;
+import com.assemblock.assemblock_be.Dto.BoardListResponse;
 import com.assemblock.assemblock_be.Service.BoardService;
-import com.assemblock.assemblock_be.Security.UserDetailsImpl;
+import com.assemblock.assemblock_be.Entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -21,86 +23,88 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping
-    public ResponseEntity<List<BoardDto.BoardSummaryResponse>> getMyBoards(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+    public ResponseEntity<List<BoardListResponse>> getMyBoards(
+            @AuthenticationPrincipal User user
     ) {
-        Long userId = userDetails.getUserId();
-        List<BoardDto.BoardSummaryResponse> boards = boardService.getMyBoards(userId);
+        Long userId = user.getId();
+        List<BoardListResponse> boards = boardService.getBoardList(userId);
         return ResponseEntity.ok(boards);
     }
 
     @PostMapping
-    public ResponseEntity<BoardDto.BoardDetailResponse> createBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody BoardDto.BoardCreateRequest requestDto
+    public ResponseEntity<Void> createBoard(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody BoardDto request
     ) {
-        Long userId = userDetails.getUserId();
-        BoardDto.BoardDetailResponse createdBoard = boardService.createBoard(userId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdBoard);
+        Long boardId = boardService.createBoard(user.getId(), request);
+        // 생성된 리소스 URI 반환 (201 Created)
+        return ResponseEntity.created(URI.create("/api/boards/" + boardId)).build();
     }
 
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> getBoardDetails(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long boardId
     ) {
-        Long userId = userDetails.getUserId();
-        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetails(userId, boardId);
+        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetail(boardId);
         return ResponseEntity.ok(boardDetail);
     }
 
     @PutMapping("/{boardId}")
-    public ResponseEntity<BoardDto.BoardDetailResponse> updateBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<Void> updateBoard(
+            @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
-            @RequestBody BoardDto.BoardUpdateRequest requestDto
+            @Valid @RequestBody BoardDto request
     ) {
-        Long userId = userDetails.getUserId();
-        BoardDto.BoardDetailResponse updatedBoard = boardService.updateBoard(userId, boardId, requestDto);
-        return ResponseEntity.ok(updatedBoard);
+        boardService.updateBoard(user.getId(), boardId, request);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal User user,
             @PathVariable Long boardId
     ) {
-        Long userId = userDetails.getUserId();
-        boardService.deleteBoard(userId, boardId);
-        return ResponseEntity.noContent().build();
+        boardService.deleteBoard(user.getId(), boardId);
+        return ResponseEntity.noContent().build(); // 204 No Content
     }
 
     @PostMapping("/{boardId}/blocks")
     public ResponseEntity<Void> addBlockToBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
             @RequestBody Map<String, Long> requestBody
     ) {
-        Long userId = userDetails.getUserId();
         Long blockId = requestBody.get("blockId");
-        boardService.addBlockToBoard(userId, boardId, blockId);
+        if (blockId == null) {
+            throw new IllegalArgumentException("blockId가 요청에 포함되어야 합니다.");
+        }
+        boardService.addBlockToBoard(user.getId(), boardId, blockId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{boardId}/blocks")
-    public ResponseEntity<Void> removeBlocksFromBoard(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+    // --- 7. 블록 제거 (DELETE /api/v1/boards/{boardId}/blocks/{blockId}) ---
+    @DeleteMapping("/{boardId}/blocks/{blockId}")
+    public ResponseEntity<Void> removeBlockFromBoard(
+            @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
-            @RequestParam List<Long> blockIds
+            @PathVariable Long blockId
     ) {
-        Long userId = userDetails.getUserId();
-        boardService.removeBlocksFromBoard(userId, boardId, blockIds);
+        boardService.removeBlockFromBoard(user.getId(), boardId, blockId);
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/proposals")
-    public ResponseEntity<Void> createTeamProposal(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestBody BoardDto.TeamProposalRequest requestDto
-    ) {
-        Long userId = userDetails.getUserId();
-        boardService.createTeamProposal(userId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
     }
 }
-

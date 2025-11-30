@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockResponse;
 import com.assemblock.assemblock_be.Dto.CategoryResponseDto;
 import com.assemblock.assemblock_be.Service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +25,11 @@ public class CategoryController {
     }
 
     @GetMapping("/blocks")
-    public ResponseEntity<List<BlockResponseDto>> getBlocks(
+    public ResponseEntity<List<BlockResponse>> getBlocks(
             @RequestParam(required = false) String categoryName,
             @RequestParam(required = false) String type
     ) {
-        List<BlockResponseDto> result = categoryService.getBlocks(categoryName, type);
+        List<BlockResponse> result = categoryService.getBlocks(categoryName, type);
         return ResponseEntity.ok(result);
     }
 }

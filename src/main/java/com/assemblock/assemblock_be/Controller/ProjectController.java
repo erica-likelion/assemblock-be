@@ -1,8 +1,10 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,28 +16,32 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    // 1) 내가 만든 프로젝트 목록
-    @GetMapping("/mine/{userId}")
-    public List<Project> getMyProjects(@PathVariable Long userId) {
-        return projectService.getMyProjects(userId);
+    @GetMapping("/me")
+    public ResponseEntity<List<Project>> getMyProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        Long currentUserId = user.getId();
+        List<Project> projects = projectService.getMyProjects(currentUserId);
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/ongoing")
-    public List<Project> getOngoingProjects(@RequestParam Long userId) {
-        return projectService.getOngoingProjects(userId);
+    public ResponseEntity<List<String>> getOngoingProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        Long currentUserId = user.getId();
+        List<String> ongoingProjects = projectService.getOngoingProjects(userId);
+        return ResponseEntity.ok(ongoingProjects);
     }
 
     @PatchMapping("/{projectId}/complete")
-    public void completeProject(
+    public ResponseEntity<Void> completeProject(
             @PathVariable Long projectId,
-            @RequestParam Long userId
+            @AuthenticationPrincipal User user
     ) {
-        projectService.completeProject(projectId, userId);
+        Long currentUserId = user.getId();
+        projectService.completeProject(projectId, currentUserId);
+        return ResponseEntity.ok().build();
     }
 
-    // 4) 완료된 프로젝트 목록
-    @GetMapping("/completed/{userId}")
-    public List<Project> getCompletedProjects(@PathVariable Long userId) {
-        return projectService.getCompletedProjects(userId);
-    }
 }

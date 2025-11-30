@@ -1,13 +1,8 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.SearchDto;
-import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.SearchHistory;
-import com.assemblock.assemblock_be.Entity.User;
-import com.assemblock.assemblock_be.Repository.BlockRepository;
-import com.assemblock.assemblock_be.Repository.SearchHistoryRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Dto.*;
+import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +20,7 @@ public class SearchService {
     private final UserRepository userRepository;
 
     @Transactional
-    public List<BlockResponseDto> searchBlocks(Long userId, String keyword) {
+    public List<BlockResponse> searchBlocks(Long userId, String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return Collections.emptyList();
         }
@@ -41,7 +36,7 @@ public class SearchService {
         List<Block> blocks = blockRepository.findByKeyword(keyword);
 
         return blocks.stream()
-                .map(BlockResponseDto::fromEntity)
+                .map(BlockResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 

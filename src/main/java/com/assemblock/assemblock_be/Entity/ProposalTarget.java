@@ -3,6 +3,7 @@ package com.assemblock.assemblock_be.Entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import com.assemblock.assemblock_be.Entity.*;
 
 @Entity
 @Getter
@@ -16,9 +17,8 @@ public class ProposalTarget {
 
     @JsonIgnore
     @MapsId("proposalId")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id")
-    private com.assemblock.assemblock_be.Entity.Proposal proposal;
+    private Proposal proposal_id;
 
     @JsonIgnore
     @MapsId("proposalBlockId")

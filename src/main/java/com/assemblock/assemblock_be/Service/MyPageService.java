@@ -2,7 +2,6 @@
 
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ProfileUpdateRequestDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
@@ -65,7 +64,7 @@ public class MyPageService {
         return mockUrl;
     }
 
-    public List<BlockResponseDto> getMyBlocks(Long currentUserId, String type) {
+    public List<BlockResponse> getMyBlocks(Long currentUserId, String type) {
         User user = findUserById(currentUserId);
         List<Block> blocks;
 
@@ -81,7 +80,7 @@ public class MyPageService {
         }
 
         return blocks.stream()
-                .map(BlockResponseDto::fromEntity)
+                .map(BlockResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 

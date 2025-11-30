@@ -4,7 +4,7 @@ import com.assemblock.assemblock_be.Entity.Proposal;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.*;
 
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

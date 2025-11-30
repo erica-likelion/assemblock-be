@@ -1,10 +1,8 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.NotificationResponseDto;
+import com.assemblock.assemblock_be.Dto.*;
 import com.assemblock.assemblock_be.Entity.*;
-import com.assemblock.assemblock_be.Repository.BlockRepository;
-import com.assemblock.assemblock_be.Repository.ProposalTargetRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

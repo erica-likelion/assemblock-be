@@ -26,7 +26,7 @@ public class ProfileService {
         return MyProfileResponseDto.fromEntity(user);
     }
 
-    public List<BlockResponseDto> getPublicBlocks(Long userId, String type) {
+    public List<BlockResponse> getPublicBlocks(Long userId, String type) {
         User user = findPublicUserById(userId);
         List<Block> blocks;
 

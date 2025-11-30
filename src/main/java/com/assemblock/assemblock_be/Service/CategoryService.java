@@ -1,9 +1,7 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.CategoryResponseDto;
-import com.assemblock.assemblock_be.Entity.Block;
-import com.assemblock.assemblock_be.Entity.BlockType;
+import com.assemblock.assemblock_be.Dto.*;
+import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,26 +23,26 @@ public class CategoryService {
             List<Block> blocksInThisPart = blockRepository.findAllByTechPart(techPart);
 
             List<String> subCategories = blocksInThisPart.stream()
-                    .map(Block::getCategoryName)
+                    .map(Block::getCategory)
                     .filter(Objects::nonNull)
                     .distinct()
-                    .map(BlockCategoryName::getDbValue)
+                    .map(BlockCategory::getDbValue)
                     .collect(Collectors.toList());
 
             return new CategoryResponseDto(techPart, subCategories);
         }).collect(Collectors.toList());
     }
 
-    public List<BlockResponseDto> getBlocks(String categoryName, String type) {
+    public List<BlockResponse> getBlocks(String category, String type) {
         List<Block> blocks;
 
-        if (categoryName != null && !categoryName.isBlank()) {
-            BlockCategoryName categoryEnum = Arrays.stream(BlockCategoryName.values())
-                    .filter(c -> c.name().equals(categoryName) || c.getDbValue().equals(categoryName))
+        if (category != null && !category.isBlank()) {
+            Block.BlockCategory categoryEnum = Arrays.stream(BlockCategory.values())
+                    .filter(c -> c.name().equals(category) || c.getDbValue().equals(category))
                     .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + categoryName));
+                    .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 카테고리 이름입니다: " + category));
 
-            blocks = blockRepository.findAllByCategoryNameOrderByCreatedAtDesc(categoryEnum);
+            blocks = blockRepository.findAllByCategoryOrderByCreatedAtDesc(categoryEnum);
 
         } else if (type != null && !type.isBlank()) {
             try {
@@ -58,7 +56,7 @@ public class CategoryService {
         }
 
         return blocks.stream()
-                .map(BlockResponseDto::fromEntity)
+                .map(BlockResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 }

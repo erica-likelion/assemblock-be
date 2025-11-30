@@ -1,7 +1,6 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.BoardDto;
+import com.assemblock.assemblock_be.Dto.*;
 import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
@@ -138,7 +137,6 @@ public class BoardService {
         for (Block block : targetBlocks) {
             ProposalTarget target = ProposalTarget.builder()
                     .proposal(proposal)
-                    .proposalBlock(block)
                     .proposer(proposer)
                     .responseStatus(ProposalStatus.pending)
                     .build();
@@ -163,10 +161,10 @@ public class BoardService {
     }
 
     private BoardDto.BoardDetailResponse boardToDetailResponse(Board board) {
-        List<BlockResponseDto> blocksInBoard = boardBlockRepository.findAllByBoard(board)
+        List<BlockResponse> blocksInBoard = boardBlockRepository.findAllByBoard(board)
                 .stream()
                 .map(BoardBlock::getBlock)
-                .map(BlockResponseDto::fromEntity)
+                .map(BlockResponse::fromEntity)
                 .collect(Collectors.toList());
 
         return BoardDto.BoardDetailResponse.builder()

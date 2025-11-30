@@ -1,18 +1,17 @@
-// 카카오로그인 구현 후 수정
-
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
+import com.assemblock.assemblock_be.Dto.BlockResponse;
 import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
 import com.assemblock.assemblock_be.Dto.ProfileUpdateRequestDto;
 import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
 import com.assemblock.assemblock_be.Service.MyPageService;
+import com.assemblock.assemblock_be.Entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal; // 카카오로그인 구현 후 수정
-import com.assemblock.assemblock_be.Security.UserDetailsImpl; // 카카오로그인 구현 후 수정
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -25,49 +24,49 @@ public class MyPageController {
 
     @GetMapping("/profile")
     public ResponseEntity<MyProfileResponseDto> getMyProfile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails
+            @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = userDetails.getUserId();
+        Long currentUserId = user.getId();
         MyProfileResponseDto responseDto = myPageService.getMyProfile(currentUserId);
         return ResponseEntity.ok(responseDto);
     }
 
     @PutMapping("/profile")
     public ResponseEntity<MyProfileResponseDto> updateMyProfile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal User user,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
-        Long currentUserId = userDetails.getUserId();
+        Long currentUserId = user.getId();
         MyProfileResponseDto responseDto = myPageService.updateMyProfile(currentUserId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/blocks")
-    public ResponseEntity<List<BlockResponseDto>> getMyBlocks(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<List<BlockResponse>> getMyBlocks(
+            @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "ALL") String type
     ) {
-        Long currentUserId = userDetails.getUserId();
-        List<BlockResponseDto> blocks = myPageService.getMyBlocks(currentUserId, type);
+        Long currentUserId = user.getId();
+        List<BlockResponse> blocks = myPageService.getMyBlocks(currentUserId, type);
         return ResponseEntity.ok(blocks);
     }
 
     @GetMapping("/reviews")
     public ResponseEntity<List<ReviewResponseDto>> getMyReviews(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal User user,
             @RequestParam String type
     ) {
-        Long currentUserId = userDetails.getUserId();
+        Long currentUserId = user.getId();
         List<ReviewResponseDto> reviews = myPageService.getMyReviews(currentUserId, type);
         return ResponseEntity.ok(reviews);
     }
 
-    @PostMapping(value = "/upload", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> uploadFile(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file
     ) {
-        String fileUrl = myPageService.uploadFile(userDetails.getUserId(), file);
+        String fileUrl = myPageService.uploadFile(user.getId(), file);
         return ResponseEntity.ok(Map.of("fileUrl", fileUrl));
     }
 }
