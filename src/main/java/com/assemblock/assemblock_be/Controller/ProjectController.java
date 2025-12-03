@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +18,19 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+
+    // 0. 프로젝트 생성 (제안 -> 프로젝트)
+    @PostMapping
+    public ResponseEntity<Void> createProject(
+            @AuthenticationPrincipal User user,
+            @RequestBody Map<String, Object> request
+    ) {
+        Long proposalId = Long.valueOf(request.get("proposalId").toString());
+        String memberRole = (String) request.get("memberRole");
+
+        projectService.createProject(user.getId(), proposalId, memberRole);
+        return ResponseEntity.ok().build();
+    }
 
     // 1. 내 프로젝트 조회
     @GetMapping("/me")

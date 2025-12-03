@@ -43,4 +43,10 @@ public class Project {
 
     @OneToMany(mappedBy = "project", orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
+    public Project(Proposal proposal, User proposer) {
+        this.proposal = proposal;
+        this.proposer = proposer;
+        this.projectStatus = ProjectStatus.recruiting;
+    }
 }

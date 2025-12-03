@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,18 +38,11 @@ public class MyPageService {
     public MyProfileResponseDto updateMyProfile(Long currentUserId, ProfileUpdateRequestDto requestDto) {
         User user = findUserById(currentUserId);
 
-        List<Role> convertedRoles = null;
-        if (requestDto.getMainRoles() != null) {
-            convertedRoles = requestDto.getMainRoles().stream()
-                    .map(memberRole -> Role.valueOf(memberRole.name()))
-                    .collect(Collectors.toList());
-        }
-
         user.updateProfile(
                 requestDto.getNickname(),
                 requestDto.getPortfolioUrl(),
                 requestDto.getIntroduction(),
-                convertedRoles,
+                requestDto.getMainRoles(),
                 requestDto.getProfileType(),
                 requestDto.getPortfolioPdfUrl()
         );
@@ -61,8 +55,9 @@ public class MyPageService {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
 
-        // 임시 URL 로직 (S3 설정 시 실제 로직으로 대체)
-        String fileName = file.getOriginalFilename();
+        // [수정] 파일명 중복 방지를 위한 UUID 적용 (S3 적용 전 임시 로직)
+        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+
         return "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
     }
 

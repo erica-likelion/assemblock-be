@@ -17,7 +17,7 @@ public class CategoryResponseDto {
     private List<String> categoryNames;
 
     public CategoryResponseDto(Block.TechPart techPart, List<String> categoryNames) {
-        this.techPart = techPart.name();
+        this.techPart = techPart.getValue();
         this.categoryNames = categoryNames;
     }
 }

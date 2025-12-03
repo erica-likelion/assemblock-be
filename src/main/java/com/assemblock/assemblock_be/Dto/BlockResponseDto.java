@@ -19,6 +19,10 @@ public class BlockResponseDto {
     private String toolsText;
     private String oneLineSummary;
     private Block.TechPart techPart;
+    private String improvementPoint;
+    private String resultUrl;
+    private String resultFile;
+
 
     private Long writerId;
     private String writerNickname;
@@ -36,6 +40,9 @@ public class BlockResponseDto {
         this.toolsText = block.getToolsText();
         this.oneLineSummary = block.getOneLineSummary();
         this.techPart = block.getTechPart();
+        this.improvementPoint = block.getImprovementPoint();
+        this.resultUrl = block.getResultUrl();
+        this.resultFile = block.getResultFile();
 
         if (block.getUser() != null) {
             this.writerId = block.getUser().getId();

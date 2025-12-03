@@ -1,6 +1,8 @@
 package com.assemblock.assemblock_be.Dto;
 
-import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Entity.Role;
+import com.assemblock.assemblock_be.Entity.User;
+import com.assemblock.assemblock_be.Entity.UserProfileType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -30,7 +30,12 @@ public class BoardService {
         return boards.stream()
                 .map(board -> {
                     int blockCount = (int) boardBlockRepository.countByBoard(board);
-                    return new BoardListResponseDto(board, blockCount);
+                    List<String> previewTypes = boardBlockRepository.findTop4ByBoardOrderByCreatedAtDesc(board)
+                            .stream()
+                            .map(boardBlock -> boardBlock.getBlock().getBlockType().name())
+                            .collect(Collectors.toList());
+
+                    return new BoardListResponseDto(board, blockCount, previewTypes);
                 })
                 .collect(Collectors.toList());
     }

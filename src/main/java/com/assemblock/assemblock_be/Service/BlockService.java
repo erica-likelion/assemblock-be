@@ -43,6 +43,9 @@ public class BlockService {
                 .contributionScore(requestDto.getContributionScore())
                 .toolsText(requestDto.getToolsText())
                 .oneLineSummary(requestDto.getOneLineSummary())
+                .improvementPoint(requestDto.getImprovementPoint())
+                .resultUrl(requestDto.getResultUrl())
+                .resultFile(requestDto.getResultFile())
                 .build();
 
         blockRepository.save(block);

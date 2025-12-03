@@ -1,6 +1,7 @@
 package com.assemblock.assemblock_be.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.assemblock.assemblock_be.Entity.Project;
 
@@ -12,4 +13,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT pm.project FROM ProjectMember pm WHERE pm.user.id = :userId")
     List<Project> findProjectsByUserId(@Param("userId") Long userId);
+
+    Optional<Project> findByProposal_Id(Long proposalId);
 }

@@ -16,4 +16,6 @@ public interface BoardBlockRepository extends JpaRepository<BoardBlock, Long> {
     long countByBoard(Board board);
 
     void deleteByBoardAndBlockIn(Board board, List<Block> blocks);
+    
+    List<BoardBlock> findTop4ByBoardOrderByCreatedAtDesc(Board board);
 }

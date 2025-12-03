@@ -46,11 +46,22 @@ public class Block extends BaseTime {
     @Min(0)
     @Max(10) Integer contributionScore;
 
-    @Column(name = "tools_text", columnDefinition = "TEXT")
+    @Column(name = "tools_text", columnDefinition = "TEXT", nullable = false)
     private String toolsText;
 
     @Column(name = "oneline_summary", columnDefinition = "TEXT", nullable = false)
     private String oneLineSummary;
+
+    @Column(name = "improvement_point", columnDefinition = "TEXT")
+    private String improvementPoint;
+
+    @Column(name = "result_url")
+    private String resultUrl;
+
+    @Column(name = "result_file", length = 2048)
+    private String resultFile;
+
+
 
 
     public enum BlockCategory {

@@ -20,6 +20,41 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
+    private final ProposalRepository proposalRepository;
+
+    @Transactional
+    public void createProject(Long userId, Long proposalId, String roleStr) {
+        Proposal proposal = proposalRepository.findById(proposalId)
+                .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
+
+        if (!proposal.getProposer().getId().equals(userId)) {
+            throw new IllegalArgumentException("제안자만 프로젝트를 생성할 수 있습니다.");
+        }
+
+        if (projectRepository.findByProposal_Id(proposalId).isPresent()) {
+            throw new IllegalArgumentException("이미 생성된 프로젝트입니다.");
+        }
+
+        MemberRole memberRole;
+        try {
+            memberRole = MemberRole.valueOf(roleStr.toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("유효하지 않은 역할입니다: " + roleStr);
+        }
+
+        Project project = new Project(proposal, proposal.getProposer());
+        projectRepository.save(project);
+
+        ProjectMember member = new ProjectMember(
+                project,
+                proposal.getProposer(),
+                proposal,
+                proposal.getProposer(),
+                memberRole,
+                true
+        );
+        projectMemberRepository.save(member);
+    }
 
     // 1) 내 프로젝트 조회
     public List<Project> getMyProjects(Long userId) {

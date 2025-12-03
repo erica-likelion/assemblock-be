@@ -37,6 +37,7 @@ public class NotificationService {
                 .map(proposal -> {
                     User sender = proposal.getProposer();
                     long blockCount = proposalTargetRepository.countByProposal(proposal);
+
                     String content = proposal.getProjectTitle() + " (" + blockCount + "개 블록 제안)";
 
                     return NotificationResponseDto.builder()
