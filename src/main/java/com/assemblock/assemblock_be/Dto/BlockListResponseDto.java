@@ -13,7 +13,6 @@ public class BlockListResponseDto {
     private Block.BlockCategory categoryName;
     private Block.BlockType blockType;
     private Block.TechPart techPart;
-    private Integer contributionScore;
     private String oneLineSummary;
 
     private Long writerId;
@@ -27,7 +26,6 @@ public class BlockListResponseDto {
         this.categoryName = block.getCategoryName();
         this.blockType = block.getBlockType();
         this.techPart = block.getTechPart();
-        this.contributionScore = block.getContributionScore();
         this.oneLineSummary = block.getOneLineSummary();
         this.createdAt = block.getCreatedAt();
 

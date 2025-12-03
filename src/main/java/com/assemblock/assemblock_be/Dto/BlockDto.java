@@ -37,4 +37,10 @@ public class BlockDto {
 
     @NotBlank(message = "한줄 요약은 필수입니다.")
     private String oneLineSummary;
+
+    private String improvementPoint;
+
+    private String resultUrl;
+
+    private String resultFile;
 }
