@@ -24,7 +24,7 @@ public class ReviewController {
             @AuthenticationPrincipal User user,
             @RequestBody ReviewRequestDto requestDto
     ) {
-        Review review = reviewService.writeReview(user.getId(), requestDto);
+        Review review = reviewService.writeReview(user.getUser(), requestDto);
         return ResponseEntity.ok(review);
     }
 
@@ -51,14 +51,14 @@ public class ReviewController {
     // 5. 내가 쓴 리뷰 조회
     @GetMapping("/written")
     public ResponseEntity<List<Review>> getWrittenReviews(@AuthenticationPrincipal User user) {
-        List<Review> reviews = reviewService.getWrittenReviews(user.getId());
+        List<Review> reviews = reviewService.getWrittenReviews(user.getUser());
         return ResponseEntity.ok(reviews);
     }
 
     // 6. 내가 받은 리뷰 조회
     @GetMapping("/received")
     public ResponseEntity<List<Review>> getReceivedReviews(@AuthenticationPrincipal User user) {
-        List<Review> reviews = reviewService.getReceivedReviews(user.getId());
+        List<Review> reviews = reviewService.getReceivedReviews(user.getUser());
         return ResponseEntity.ok(reviews);
     }
 

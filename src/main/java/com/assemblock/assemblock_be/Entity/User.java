@@ -19,8 +19,8 @@ public class User extends BaseTime implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long id;
+    @Column(name = "user")
+    private Long user;
 
     @Column(nullable = false, unique = true)
     private Long kakaoId;
@@ -128,7 +128,7 @@ public class User extends BaseTime implements UserDetails {
 
     @Override
     public String getUsername() {
-        return Long.toString(this.id);
+        return Long.toString(this.user);
     }
 
     @Override

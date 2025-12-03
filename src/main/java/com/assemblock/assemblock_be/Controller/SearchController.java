@@ -22,7 +22,7 @@ public class SearchController {
             @AuthenticationPrincipal User user,
             @RequestParam("q") String keyword
     ) {
-        Long userId = user.getId();
+        Long userId = user.getUser();
         List<BlockResponseDto> result = searchService.searchBlocks(userId, keyword);
         return ResponseEntity.ok(result);
     }
@@ -31,7 +31,7 @@ public class SearchController {
     public ResponseEntity<List<SearchDto.SearchHistoryResponse>> getSearchHistory(
             @AuthenticationPrincipal User user
     ) {
-        Long userId = user.getId();
+        Long userId = user.getUser();
         List<SearchDto.SearchHistoryResponse> history = searchService.getSearchHistory(userId);
         return ResponseEntity.ok(history);
     }
@@ -40,7 +40,7 @@ public class SearchController {
     public ResponseEntity<Void> deleteAllSearchHistory(
             @AuthenticationPrincipal User user
     ) {
-        Long userId = user.getId();
+        Long userId = user.getUser();
         searchService.deleteAllSearchHistory(userId);
         return ResponseEntity.noContent().build();
     }
@@ -50,7 +50,7 @@ public class SearchController {
             @AuthenticationPrincipal User user,
             @PathVariable Long historyId
     ) {
-        Long userId = user.getId();
+        Long userId = user.getUser();
         searchService.deleteSearchHistoryItem(userId, historyId);
         return ResponseEntity.noContent().build();
     }

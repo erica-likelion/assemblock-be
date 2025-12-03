@@ -33,7 +33,7 @@ public class BlockController {
             @Valid @RequestBody BlockDto requestDto,
             @AuthenticationPrincipal User user
     ) {
-        Long blockId = blockService.createBlock(user.getId(), requestDto);
+        Long blockId = blockService.createBlock(user.getUser(), requestDto);
 
         return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).build();
     }
@@ -58,7 +58,7 @@ public class BlockController {
             @Valid @RequestBody BlockDto requestDto,
             @AuthenticationPrincipal User user
     ) {
-        blockService.updateBlock(user.getId(), blockId, requestDto);
+        blockService.updateBlock(user.getUser(), blockId, requestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -70,7 +70,7 @@ public class BlockController {
             @PathVariable Long blockId,
             @AuthenticationPrincipal User user
     ) {
-        blockService.deleteBlock(user.getId(), blockId);
+        blockService.deleteBlock(user.getUser(), blockId);
         return ResponseEntity.noContent().build();
     }
 

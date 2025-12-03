@@ -30,7 +30,7 @@ public class ProposalController {
     public ResponseEntity<List<Proposal>> getMyProposals(
             @AuthenticationPrincipal User user
     ) {
-        List<Proposal> proposals = proposalService.getMyProposals(user.getId());
+        List<Proposal> proposals = proposalService.getMyProposals(user.getUser());
         return ResponseEntity.ok(proposals);
     }
 

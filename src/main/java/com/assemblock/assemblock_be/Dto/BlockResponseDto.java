@@ -45,7 +45,7 @@ public class BlockResponseDto {
         this.resultFile = block.getResultFile();
 
         if (block.getUser() != null) {
-            this.writerId = block.getUser().getId();
+            this.writerId = block.getUser().getUser();
             this.writerNickname = block.getUser().getNickname();
             this.writerProfileType = block.getUser().getProfileType();
         }

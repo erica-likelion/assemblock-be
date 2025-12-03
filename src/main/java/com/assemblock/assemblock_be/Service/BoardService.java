@@ -119,7 +119,7 @@ public class BoardService {
         LocalDate endDate = LocalDate.parse(dates[1].trim(), formatter);
 
         Proposal proposal = Proposal.builder()
-                .proposer(proposer)
+                .user(proposer)
                 .projectTitle(requestDto.getProjectTitle())
                 .projectMemo(requestDto.getMemo())
                 .discordId(requestDto.getContact())
@@ -132,7 +132,7 @@ public class BoardService {
         for (Block block : targetBlocks) {
             ProposalTarget target = ProposalTarget.builder()
                     .proposal(proposal)
-                    .proposer(proposer)
+                    .user(proposer)
                     .block(block)
                     .responseStatus(ProposalStatus.pending)
                     .build();

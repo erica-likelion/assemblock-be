@@ -28,7 +28,7 @@ public class BoardController {
     public ResponseEntity<List<BoardListResponseDto>> getMyBoards(
             @AuthenticationPrincipal User user
     ) {
-        List<BoardListResponseDto> boards = boardService.getMyBoards(user.getId());
+        List<BoardListResponseDto> boards = boardService.getMyBoards(user.getUser());
         return ResponseEntity.ok(boards);
     }
 
@@ -38,7 +38,7 @@ public class BoardController {
             @AuthenticationPrincipal User user,
             @Valid @RequestBody BoardDto.BoardCreateRequest request
     ) {
-        BoardDto.BoardDetailResponse response = boardService.createBoard(user.getId(), request);
+        BoardDto.BoardDetailResponse response = boardService.createBoard(user.getUser(), request);
         return ResponseEntity.created(URI.create("/api/boards/" + response.getBoardId())).build();
     }
 
@@ -48,7 +48,7 @@ public class BoardController {
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId
     ) {
-        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetails(user.getId(), boardId);
+        BoardDto.BoardDetailResponse boardDetail = boardService.getBoardDetails(user.getUser(), boardId);
         return ResponseEntity.ok(boardDetail);
     }
 
@@ -59,7 +59,7 @@ public class BoardController {
             @PathVariable Long boardId,
             @Valid @RequestBody BoardDto.BoardUpdateRequest request
     ) {
-        boardService.updateBoard(user.getId(), boardId, request);
+        boardService.updateBoard(user.getUser(), boardId, request);
         return ResponseEntity.ok().build();
     }
 
@@ -69,7 +69,7 @@ public class BoardController {
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId
     ) {
-        boardService.deleteBoard(user.getId(), boardId);
+        boardService.deleteBoard(user.getUser(), boardId);
         return ResponseEntity.noContent().build();
     }
 
@@ -84,7 +84,7 @@ public class BoardController {
         if (blockId == null) {
             throw new IllegalArgumentException("blockId가 요청에 포함되어야 합니다.");
         }
-        boardService.addBlockToBoard(user.getId(), boardId, blockId);
+        boardService.addBlockToBoard(user.getUser(), boardId, blockId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -95,7 +95,7 @@ public class BoardController {
             @PathVariable Long boardId,
             @PathVariable Long blockId
     ) {
-        boardService.removeBlocksFromBoard(user.getId(), boardId, Collections.singletonList(blockId));
+        boardService.removeBlocksFromBoard(user.getUser(), boardId, Collections.singletonList(blockId));
         return ResponseEntity.noContent().build();
     }
 
@@ -104,7 +104,7 @@ public class BoardController {
             @AuthenticationPrincipal User user,
             @RequestBody BoardDto.TeamProposalRequest requestDto
     ) {
-        boardService.createTeamProposal(user.getId(), requestDto);
+        boardService.createTeamProposal(user.getUser(), requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

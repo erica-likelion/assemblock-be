@@ -28,8 +28,8 @@ public class ProposalTarget {
     private Block block;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposer_id", nullable = false)
-    private User proposer;
+    @JoinColumn(name = "user", nullable = false)
+    private User user;
 
     @Setter
     @Builder.Default

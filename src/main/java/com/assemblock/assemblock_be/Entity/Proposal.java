@@ -22,8 +22,8 @@ public class Proposal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposer_id", nullable = false)
-    private User proposer;
+    @JoinColumn(name = "user", nullable = false)
+    private User user;
 
     @Column(name = "discord_id", nullable = false)
     private String discordId;

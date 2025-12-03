@@ -23,7 +23,7 @@ public class UserResponseDto {
     private Boolean isPublishing;
 
     public UserResponseDto(User user) {
-        this.userId = user.getId();
+        this.userId = user.getUser();
         this.nickname = user.getNickname();
         this.roles = user.getRoles();
         this.introduction = user.getIntroduction();

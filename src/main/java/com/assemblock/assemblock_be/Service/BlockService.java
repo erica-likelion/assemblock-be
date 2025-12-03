@@ -69,7 +69,7 @@ public class BlockService {
         Block block = blockRepository.findById(blockId)
                 .orElseThrow(() -> new IllegalArgumentException("Block not found"));
 
-        if (!block.getUser().getId().equals(user.getId())) {
+        if (!block.getUser().getUser().equals(user.getUser())) {
             throw new AccessDeniedException("User does not have permission to update this block");
         }
 
@@ -90,7 +90,7 @@ public class BlockService {
         Block block = blockRepository.findById(blockId)
                 .orElseThrow(() -> new IllegalArgumentException("Block not found"));
 
-        if (!block.getUser().getId().equals(user.getId())) {
+        if (!block.getUser().getUser().equals(user.getUser())) {
             throw new AccessDeniedException("User does not have permission to delete this block");
         }
 

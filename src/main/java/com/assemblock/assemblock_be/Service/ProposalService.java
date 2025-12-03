@@ -31,7 +31,7 @@ public class ProposalService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         Proposal proposal = Proposal.builder()
-                .proposer(user)
+                .user(user)
                 .discordId(dto.getDiscordId())
                 .recruitStartDate(dto.getRecruitStartDate())
                 .recruitEndDate(dto.getRecruitEndDate())
@@ -54,8 +54,8 @@ public class ProposalService {
 
         return ProposalResponseDto.builder()
                 .proposalId(proposal.getId())
-                .proposerId(proposal.getProposer().getId())
-                .proposerNickname(proposal.getProposer().getNickname())
+                .proposerId(proposal.getUser().getUser())
+                .proposerNickname(proposal.getUser().getNickname())
                 .discordId(proposal.getDiscordId())
                 .recruitStartDate(proposal.getRecruitStartDate())
                 .recruitEndDate(proposal.getRecruitEndDate())

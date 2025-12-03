@@ -29,7 +29,7 @@ public class AuthController {
             @Valid @RequestBody SignupDto requestDto,
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
+        Long currentUserId = user.getUser();
         authService.completeProfile(currentUserId, requestDto);
         return ResponseEntity.ok("Profile setup complete.");
     }

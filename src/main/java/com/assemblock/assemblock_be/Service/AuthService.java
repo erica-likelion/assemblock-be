@@ -49,8 +49,8 @@ public class AuthService {
             user = existingUser.get();
         }
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId());
-        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getUser());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getUser());
 
         return new AuthResponseDto(
                 accessToken,
@@ -81,7 +81,7 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + userId));
 
-        String newAccessToken = jwtTokenProvider.createAccessToken(user.getId());
+        String newAccessToken = jwtTokenProvider.createAccessToken(user.getUser());
 
         return new TokenRefreshResponseDto(newAccessToken, refreshToken);
     }

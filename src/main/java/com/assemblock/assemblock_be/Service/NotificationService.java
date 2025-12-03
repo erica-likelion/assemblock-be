@@ -35,7 +35,7 @@ public class NotificationService {
                 .map(ProposalTarget::getProposal)
                 .distinct()
                 .map(proposal -> {
-                    User sender = proposal.getProposer();
+                    User sender = proposal.getUser();
                     long blockCount = proposalTargetRepository.countByProposal(proposal);
 
                     String content = proposal.getProjectTitle() + " (" + blockCount + "개 블록 제안)";
@@ -69,7 +69,7 @@ public class NotificationService {
         }
 
         for (ProposalTarget target : targets) {
-            Long blockOwnerId = target.getBlock().getUser().getId();
+            Long blockOwnerId = target.getBlock().getUser().getUser();
 
             if (!blockOwnerId.equals(currentUserId)) {
                 throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");

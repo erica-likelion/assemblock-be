@@ -28,7 +28,7 @@ public class ProjectController {
         Long proposalId = Long.valueOf(request.get("proposalId").toString());
         String memberRole = (String) request.get("memberRole");
 
-        projectService.createProject(user.getId(), proposalId, memberRole);
+        projectService.createProject(user.getUser(), proposalId, memberRole);
         return ResponseEntity.ok().build();
     }
 
@@ -37,7 +37,7 @@ public class ProjectController {
     public ResponseEntity<List<Project>> getMyProjects(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
+        Long currentUserId = user.getUser();
         List<Project> projects = projectService.getMyProjects(currentUserId);
         return ResponseEntity.ok(projects);
     }
@@ -47,7 +47,7 @@ public class ProjectController {
     public ResponseEntity<List<String>> getOngoingProjects(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
+        Long currentUserId = user.getUser();
         List<String> ongoingProjects = projectService.getOngoingProjects(currentUserId);
         return ResponseEntity.ok(ongoingProjects);
     }
@@ -58,7 +58,7 @@ public class ProjectController {
             @PathVariable Long projectId,
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
+        Long currentUserId = user.getUser();
         projectService.completeProject(projectId, currentUserId);
         return ResponseEntity.ok().build();
     }

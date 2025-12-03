@@ -27,7 +27,7 @@ public class ProjectService {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
 
-        if (!proposal.getProposer().getId().equals(userId)) {
+        if (!proposal.getUser().getUser().equals(userId)) {
             throw new IllegalArgumentException("제안자만 프로젝트를 생성할 수 있습니다.");
         }
 
@@ -42,14 +42,14 @@ public class ProjectService {
             throw new IllegalArgumentException("유효하지 않은 역할입니다: " + roleStr);
         }
 
-        Project project = new Project(proposal, proposal.getProposer());
+        Project project = new Project(proposal, proposal.getUser());
         projectRepository.save(project);
 
         ProjectMember member = new ProjectMember(
                 project,
-                proposal.getProposer(),
+                proposal.getUser(),
                 proposal,
-                proposal.getProposer(),
+                proposal.getUser(),
                 memberRole,
                 true
         );
@@ -117,7 +117,7 @@ public class ProjectService {
                 .map(member -> ProjectMemberResponseDto.builder()
                         .memberId(member.getId())
                         .projectId(member.getProject().getId())
-                        .userId(member.getUser().getId())
+                        .userId(member.getUser().getUser())
                         .memberRole(member.getMemberRole().name())
                         .isProposer(member.getIsProposer())
                         .build())
