@@ -30,7 +30,7 @@ public class ProposalController {
     public ResponseEntity<List<Proposal>> getMyProposals(
             @AuthenticationPrincipal User user
     ) {
-        List<Proposal> proposals = proposalService.getMyProposals(user.getUser());
+        List<Proposal> proposals = proposalService.getMyProposals(user.getId());
         return ResponseEntity.ok(proposals);
     }
 
@@ -46,5 +46,11 @@ public class ProposalController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         proposalService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<Proposal>> getAllProposals() {
+        List<Proposal> proposals = proposalService.findAll();
+        return ResponseEntity.ok(proposals);
     }
 }

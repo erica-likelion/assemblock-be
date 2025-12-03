@@ -69,7 +69,7 @@ public class NotificationService {
         }
 
         for (ProposalTarget target : targets) {
-            Long blockOwnerId = target.getBlock().getUser().getUser();
+            Long blockOwnerId = target.getBlock().getUser().getId();
 
             if (!blockOwnerId.equals(currentUserId)) {
                 throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");

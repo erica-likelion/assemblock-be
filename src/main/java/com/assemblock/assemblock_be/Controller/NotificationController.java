@@ -21,7 +21,7 @@ public class NotificationController {
     public ResponseEntity<List<NotificationResponseDto>> getPendingNotifications(
             @AuthenticationPrincipal User user
     ) {
-        List<NotificationResponseDto> notifications = notificationService.getPendingNotifications(user.getUser());
+        List<NotificationResponseDto> notifications = notificationService.getPendingNotifications(user.getId());
         return ResponseEntity.ok(notifications);
     }
 
@@ -30,7 +30,7 @@ public class NotificationController {
             @AuthenticationPrincipal User user,
             @PathVariable Long proposalId
     ) throws AccessDeniedException {
-        notificationService.acceptProposal(user.getUser(), proposalId);
+        notificationService.acceptProposal(user.getId(), proposalId);
         return ResponseEntity.ok().build();
     }
 
@@ -39,7 +39,7 @@ public class NotificationController {
             @AuthenticationPrincipal User user,
             @PathVariable Long proposalId
     ) throws AccessDeniedException {
-        notificationService.rejectProposal(user.getUser(), proposalId);
+        notificationService.rejectProposal(user.getId(), proposalId);
         return ResponseEntity.ok().build();
     }
 }

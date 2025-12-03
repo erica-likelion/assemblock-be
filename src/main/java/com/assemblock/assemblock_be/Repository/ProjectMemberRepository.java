@@ -10,9 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
 
-    List<ProjectMember> findByProject_ProjectId(Long projectId);
+    List<ProjectMember> findByProject_Id(Long projectId);
 
-    Optional<ProjectMember> findByProject_ProjectIdAndUser_UserId(Long projectId, Long userId);
+    Optional<ProjectMember> findByProject_IdAndUser_Id(Long projectId, Long userId);
 
     Optional<ProjectMember> findByProjectAndUser(Project project, User user);
 }

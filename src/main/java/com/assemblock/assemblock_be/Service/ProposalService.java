@@ -12,6 +12,8 @@ import com.assemblock.assemblock_be.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ProposalService {
 
+    private static final Logger log = LoggerFactory.getLogger(ProposalService.class);
+
     private final ProposalRepository proposalRepository;
     private final UserRepository userRepository;
     private final ProposalTargetRepository proposalTargetRepository;
@@ -29,6 +33,8 @@ public class ProposalService {
     public void createProposal(ProposalCreateRequestDto dto) {
         User user = userRepository.findById(dto.getProposerId())
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        log.info("새 Proposal 생성자 유저 ID: {}", user.getId());
 
         Proposal proposal = Proposal.builder()
                 .user(user)
@@ -46,6 +52,8 @@ public class ProposalService {
         Proposal proposal = proposalRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
 
+        log.info("제안서 상세 조회: {}", proposal.toString());
+
         List<BlockResponseDto> targetBlocks = proposalTargetRepository.findAllByProposal_Id(id)
                 .stream()
                 .map(ProposalTarget::getBlock)
@@ -54,7 +62,7 @@ public class ProposalService {
 
         return ProposalResponseDto.builder()
                 .proposalId(proposal.getId())
-                .proposerId(proposal.getUser().getUser())
+                .proposerId(proposal.getUser().getId())
                 .proposerNickname(proposal.getUser().getNickname())
                 .discordId(proposal.getDiscordId())
                 .recruitStartDate(proposal.getRecruitStartDate())
@@ -67,7 +75,7 @@ public class ProposalService {
     }
 
     public List<Proposal> getMyProposals(Long userId) {
-        return proposalRepository.findAllByProposer_Id(userId);
+        return proposalRepository.findAllByUser_Id(userId);
     }
 
     public List<Proposal> findAll() {

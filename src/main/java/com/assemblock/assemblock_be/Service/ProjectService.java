@@ -27,7 +27,7 @@ public class ProjectService {
         Proposal proposal = proposalRepository.findById(proposalId)
                 .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
 
-        if (!proposal.getUser().getUser().equals(userId)) {
+        if (!proposal.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("제안자만 프로젝트를 생성할 수 있습니다.");
         }
 
@@ -74,7 +74,7 @@ public class ProjectService {
     @Transactional
     public void completeProject(Long projectId, Long userId) {
         ProjectMember member = projectMemberRepository
-                .findByProject_ProjectIdAndUser_UserId(projectId, userId)
+                .findByProject_IdAndUser_Id(projectId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("팀원이 아닙니다."));
 
         if (!member.getIsProposer()) {
@@ -111,13 +111,13 @@ public class ProjectService {
 
     // 5) 프로젝트 멤버 목록 조회
     public List<ProjectMemberResponseDto> getProjectMembers(Long projectId) {
-        List<ProjectMember> members = projectMemberRepository.findByProject_ProjectId(projectId);
+        List<ProjectMember> members = projectMemberRepository.findByProject_Id(projectId);
 
         return members.stream()
                 .map(member -> ProjectMemberResponseDto.builder()
                         .memberId(member.getId())
                         .projectId(member.getProject().getId())
-                        .userId(member.getUser().getUser())
+                        .userId(member.getUser().getId())
                         .memberRole(member.getMemberRole().name())
                         .isProposer(member.getIsProposer())
                         .build())

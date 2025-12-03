@@ -25,7 +25,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getMyProfile(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getUser();
+        Long currentUserId = user.getId();
         UserResponseDto response = userService.getMyProfile(currentUserId);
         return ResponseEntity.ok(response);
     }

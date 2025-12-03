@@ -5,5 +5,5 @@ import com.assemblock.assemblock_be.Entity.Proposal;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
-    List<Proposal> findAllByProposer_Id(Long userId);
+    List<Proposal> findAllByUser_Id(Long userId);
 }

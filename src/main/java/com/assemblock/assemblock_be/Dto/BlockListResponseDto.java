@@ -30,7 +30,7 @@ public class BlockListResponseDto {
         this.createdAt = block.getCreatedAt();
 
         if (block.getUser() != null) {
-            this.writerId = block.getUser().getUser();
+            this.writerId = block.getUser().getId();
             this.writerNickname = block.getUser().getNickname();
         }
     }

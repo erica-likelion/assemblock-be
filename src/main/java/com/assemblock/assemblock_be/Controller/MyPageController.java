@@ -27,7 +27,7 @@ public class MyPageController {
     public ResponseEntity<MyProfileResponseDto> getMyProfile(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getUser();
+        Long currentUserId = user.getId();
         MyProfileResponseDto responseDto = myPageService.getMyProfile(currentUserId);
         return ResponseEntity.ok(responseDto);
     }
@@ -37,7 +37,7 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             @RequestBody ProfileUpdateRequestDto requestDto
     ) {
-        Long currentUserId = user.getUser();
+        Long currentUserId = user.getId();
         MyProfileResponseDto responseDto = myPageService.updateMyProfile(currentUserId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
@@ -47,7 +47,7 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "ALL") String type
     ) {
-        Long currentUserId = user.getUser();
+        Long currentUserId = user.getId();
         List<BlockResponseDto> blocks = myPageService.getMyBlocks(currentUserId, type);
         return ResponseEntity.ok(blocks);
     }
@@ -57,7 +57,7 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             @RequestParam String type
     ) {
-        Long currentUserId = user.getUser();
+        Long currentUserId = user.getId();
         List<ReviewResponseDto> reviews = myPageService.getMyReviews(currentUserId, type);
         return ResponseEntity.ok(reviews);
     }
@@ -67,7 +67,8 @@ public class MyPageController {
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file
     ) {
-        String fileUrl = myPageService.uploadFile(file);
+        Long currentUserId = user.getId();
+        String fileUrl = myPageService.uploadFile(currentUserId, file);
         return ResponseEntity.ok(Map.of("fileUrl", fileUrl));
     }
 }

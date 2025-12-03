@@ -50,13 +50,12 @@ public class MyPageService {
     }
 
     @Transactional
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(Long userId, MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
 
-        // [수정] 파일명 중복 방지를 위한 UUID 적용 (S3 적용 전 임시 로직)
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String fileName = "user_" + userId + "_" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
         return "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
     }
@@ -96,6 +95,7 @@ public class MyPageService {
         return reviewsToProcess.stream()
                 .map(review -> {
                     Project project = review.getProject();
+
                     User targetUser = "SCOUTING".equalsIgnoreCase(type) ? review.getReviewedUser() : review.getUser();
 
                     Optional<ProjectMember> roleOpt = projectMemberRepository.findByProjectAndUser(project, targetUser);

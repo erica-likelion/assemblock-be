@@ -22,7 +22,7 @@ public class Block extends BaseTime {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id",  nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
