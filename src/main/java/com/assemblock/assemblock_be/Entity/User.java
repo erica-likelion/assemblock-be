@@ -41,6 +41,9 @@ public class User extends BaseTime implements UserDetails {
     @Column(name = "profile_type")
     private UserProfileType profileType;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
@@ -82,6 +85,7 @@ public class User extends BaseTime implements UserDetails {
         this.reviewReceivedCnt = 0;
         this.reliabilityLevel = new BigDecimal("0.0");
         this.isPublishing = true;
+        // nickname은 여기서 설정하지 않으므로 null 상태로 생성됩니다.
     }
 
     public void completeProfile(SignupDto dto) {
@@ -112,6 +116,11 @@ public class User extends BaseTime implements UserDetails {
 
     public void increaseReviewReceivedCnt() {
         this.reviewReceivedCnt++;
+    }
+
+    // [수정 3] Refresh Token 업데이트 메서드 구현
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     @Override
