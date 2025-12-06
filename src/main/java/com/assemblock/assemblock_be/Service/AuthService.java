@@ -15,8 +15,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -41,17 +43,21 @@ public class AuthService {
         // 2. 카카오 액세스 토큰으로 유저 정보(ID) 조회
         Long kakaoId = getKakaoUserId(kakaoAccessToken);
 
-        // 3. DB 조회 및 신규 유저 판별
-        User user = userRepository.findByKakaoId(kakaoId)
-                .orElseGet(() -> {
-                    User newUser = User.builder()
-                            .kakaoId(kakaoId)
-                            .build();
-                    return userRepository.save(newUser);
-                });
+        Optional<User> existingUser = userRepository.findByKakaoId(kakaoId);
 
-        boolean isNewUser = (user.getCreatedAt().equals(user.getUpdatedAt())); // 혹은 별도의 로직으로 신규 여부 판단
+        boolean isNewUser = existingUser.isEmpty();
+        User user;
 
+        if (isNewUser) {
+            // [수정 포인트] 빌더 패턴에 nickname을 추가합니다.
+            user = User.builder()
+                    .kakaoId(kakaoId)
+                    .nickname("Guest_" + kakaoId) // [핵심] 임시 닉네임 부여 (예: Guest_12345)
+                    .build();
+            userRepository.save(user);
+        } else {
+            user = existingUser.get();
+        }
         // 4. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
@@ -62,7 +68,6 @@ public class AuthService {
         return new AuthResponseDto(
                 accessToken,
                 refreshToken,
-                isNewUser,
                 user.isProfileComplete()
         );
     }
@@ -81,25 +86,21 @@ public class AuthService {
             throw new JwtException("Invalid Refresh Token");
         }
 
-        // 2. 토큰에서 유저 ID 추출
         Long userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
 
-        // 3. DB 유저 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id : " + userId));
 
-        // [중요 수정] DB에 저장된 토큰과 요청 들어온 토큰 일치 여부 확인
         if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) {
             throw new JwtException("Refresh Token does not match");
         }
 
-        // 4. 새 액세스 토큰 발급
         String newAccessToken = jwtTokenProvider.createAccessToken(user.getId());
 
         return new TokenRefreshResponseDto(newAccessToken, refreshToken);
     }
 
-    // [수정] WebClient 파라미터 전송 방식 개선 (MultiValueMap 사용)
+
     private String getKakaoAccessToken(String code) {
         String tokenUri = "https://kauth.kakao.com/oauth/token";
 
@@ -109,23 +110,25 @@ public class AuthService {
         params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
 
-        Map response = webClient.post()
-                .uri(tokenUri)
-                .header("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-                .body(BodyInserters.fromFormData(params))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+        try {
+            Map response = webClient.post()
+                    .uri(tokenUri)
+                    .contentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData(params))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
 
-        if (response == null || !response.containsKey("access_token")) {
-            throw new RuntimeException("Failed to retrieve Kakao access token");
+            return (String) response.get("access_token");
+
+        } catch (WebClientResponseException e) {
+            log.error("Kakao Token Error: {}", e.getResponseBodyAsString());
+            throw new RuntimeException("카카오 토큰 발급 실패 (KOE001): " + e.getResponseBodyAsString());
         }
-
-        return (String) response.get("access_token");
     }
 
     private Long getKakaoUserId(String accessToken) {
-        String userUri = "https://kapi.kakao.com/user/me";
+        String userUri = "https://kapi.kakao.com/v2/user/me";
 
         Map response = webClient.get()
                 .uri(userUri)

@@ -25,7 +25,7 @@ public class User extends BaseTime implements UserDetails {
     @Column(nullable = false, unique = true)
     private Long kakaoId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String nickname;
 
     @Column(name = "introduction")
@@ -78,14 +78,15 @@ public class User extends BaseTime implements UserDetails {
     private List<Board> boards = new ArrayList<>();
 
     @Builder
-    public User(Long kakaoId) {
+    public User(Long kakaoId, String nickname) {
         this.kakaoId = kakaoId;
+        this.nickname = nickname;
         this.isProfileComplete = false;
+        this.profileType = UserProfileType.TYPE_1;
         this.reviewSentCnt = 0;
         this.reviewReceivedCnt = 0;
         this.reliabilityLevel = new BigDecimal("0.0");
         this.isPublishing = true;
-        // nickname은 여기서 설정하지 않으므로 null 상태로 생성됩니다.
     }
 
     public void completeProfile(SignupDto dto) {
