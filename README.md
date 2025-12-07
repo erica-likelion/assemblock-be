@@ -1,6 +1,6 @@
 ## 코드 실행에서 db 에러가 나는 경우 ##
 
-### Config 폴더 안에 TableCleaner.java 생성
+- Config 폴더 안에 TableCleaner.java 생성
 
 
 ```
@@ -48,4 +48,7 @@ public class TableCleaner implements CommandLineRunner {
 
 ---
 
-## swagger
+## swagger 실행 방법
+
+- /Config/SwaggerConfig 코드 여부 확인 후 서버 실행
+- http://localhost:9090/swagger-ui/index.html#/ 접속
