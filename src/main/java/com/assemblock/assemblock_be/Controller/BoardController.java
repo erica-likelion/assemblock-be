@@ -34,12 +34,12 @@ public class BoardController {
 
     // 2. 보드 생성
     @PostMapping
-    public ResponseEntity<Void> createBoard(
+    public ResponseEntity<BoardDto.BoardDetailResponse> createBoard(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody BoardDto.BoardCreateRequest request
     ) {
         BoardDto.BoardDetailResponse response = boardService.createBoard(user.getId(), request);
-        return ResponseEntity.created(URI.create("/api/boards/" + response.getBoardId())).build();
+        return ResponseEntity.created(URI.create("/api/boards/" + response.getBoardId())).body(response);
     }
 
     // 3. 보드 상세 조회

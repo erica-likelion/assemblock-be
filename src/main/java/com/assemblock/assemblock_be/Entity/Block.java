@@ -40,13 +40,13 @@ public class Block extends BaseTime {
     @Column(name = "block_type", nullable = false)
     private BlockType blockType;
 
-    @Check(constraints = "contribution_score >= 0 AND contribution_score <= 10")
+    @Check(constraints = "contribution_score >= 0 AND contribution_score <= 100")
     @Column(name = "contribution_score", nullable = false)
     private @NotNull(message = "기여도는 필수입니다.")
     @Min(0)
-    @Max(10) Integer contributionScore;
+    @Max(100) Integer contributionScore;
 
-    @Column(name = "tools_text", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "tools_text", columnDefinition = "TEXT")
     private String toolsText;
 
     @Column(name = "oneline_summary", columnDefinition = "TEXT", nullable = false)
@@ -93,6 +93,9 @@ public class Block extends BaseTime {
         this.contributionScore = dto.getContributionScore();
         this.toolsText = dto.getToolsText();
         this.oneLineSummary = dto.getOneLineSummary();
+        this.improvementPoint = dto.getImprovementPoint();
+        this.resultUrl = dto.getResultUrl();
+        this.resultFile = dto.getResultFile();
     }
 
     public void update(BlockDto dto) {
@@ -103,5 +106,8 @@ public class Block extends BaseTime {
         this.contributionScore = dto.getContributionScore();
         this.toolsText = dto.getToolsText();
         this.oneLineSummary = dto.getOneLineSummary();
+        this.improvementPoint = dto.getImprovementPoint();
+        this.resultUrl = dto.getResultUrl();
+        this.resultFile = dto.getResultFile();
     }
 }

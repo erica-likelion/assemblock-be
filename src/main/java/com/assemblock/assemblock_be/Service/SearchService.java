@@ -33,7 +33,7 @@ public class SearchService {
                 .keyword(keyword)
                 .build());
 
-        List<Block> blocks = blockRepository.findByKeyword(keyword);
+        List<Block> blocks = blockRepository.findBlocksDynamic(null, null, keyword);
 
         return blocks.stream()
                 .map(BlockResponseDto::fromEntity)
