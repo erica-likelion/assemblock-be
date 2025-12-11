@@ -18,14 +18,12 @@ public class ProposalController {
 
     private final ProposalService proposalService;
 
-    // 1. 제안 생성
     @PostMapping
     public ResponseEntity<Void> createProposal(@RequestBody ProposalCreateRequestDto requestDto) {
         proposalService.createProposal(requestDto);
         return ResponseEntity.ok().build();
     }
 
-    // 2. 내가 쓴 제안서 조회
     @GetMapping("/me")
     public ResponseEntity<List<Proposal>> getMyProposals(
             @AuthenticationPrincipal User user
@@ -34,14 +32,12 @@ public class ProposalController {
         return ResponseEntity.ok(proposals);
     }
 
-    // 3. 제안 상세 조회
     @GetMapping("/{id}")
     public ResponseEntity<ProposalResponseDto> getProposal(@PathVariable Long id) {
         ProposalResponseDto response = proposalService.getProposalDetail(id);
         return ResponseEntity.ok(response);
     }
 
-    // 4. 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         proposalService.delete(id);

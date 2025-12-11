@@ -23,15 +23,6 @@ public class MyPageController {
 
     private final MyPageService myPageService;
 
-    @GetMapping("/profile")
-    public ResponseEntity<MyProfileResponseDto> getMyProfile(
-            @AuthenticationPrincipal User user
-    ) {
-        Long currentUserId = user.getId();
-        MyProfileResponseDto responseDto = myPageService.getMyProfile(currentUserId);
-        return ResponseEntity.ok(responseDto);
-    }
-
     @PutMapping("/profile")
     public ResponseEntity<MyProfileResponseDto> updateMyProfile(
             @AuthenticationPrincipal User user,

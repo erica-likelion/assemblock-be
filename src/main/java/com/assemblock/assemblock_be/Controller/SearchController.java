@@ -1,7 +1,7 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.SearchDto;
+// import com.assemblock.assemblock_be.Dto.SearchDto;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.SearchService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class SearchController {
         List<BlockResponseDto> result = searchService.searchBlocks(userId, keyword);
         return ResponseEntity.ok(result);
     }
-
+/*
     @GetMapping("/history")
     public ResponseEntity<List<SearchDto.SearchHistoryResponse>> getSearchHistory(
             @AuthenticationPrincipal User user
@@ -54,4 +54,6 @@ public class SearchController {
         searchService.deleteSearchHistoryItem(userId, historyId);
         return ResponseEntity.noContent().build();
     }
+
+ */
 }

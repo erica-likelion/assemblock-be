@@ -37,10 +37,8 @@ public class AuthService {
 
     @Transactional
     public AuthResponseDto kakaoLogin(String authorizationCode) {
-        // 1. 인가 코드로 카카오 액세스 토큰 발급
         String kakaoAccessToken = getKakaoAccessToken(authorizationCode);
 
-        // 2. 카카오 액세스 토큰으로 유저 정보(ID) 조회
         Long kakaoId = getKakaoUserId(kakaoAccessToken);
 
         Optional<User> existingUser = userRepository.findByKakaoId(kakaoId);
@@ -49,20 +47,17 @@ public class AuthService {
         User user;
 
         if (isNewUser) {
-            // [수정 포인트] 빌더 패턴에 nickname을 추가합니다.
             user = User.builder()
                     .kakaoId(kakaoId)
-                    .nickname("Guest_" + kakaoId) // [핵심] 임시 닉네임 부여 (예: Guest_12345)
+                    .nickname("User_" + kakaoId) // 닉네임 guest1234 -> user1234로 변경
                     .build();
             userRepository.save(user);
         } else {
             user = existingUser.get();
         }
-        // 4. JWT 토큰 생성
         String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
-        // [중요 수정] 발급한 Refresh Token을 DB에 저장 (User 엔티티 업데이트)
         user.updateRefreshToken(refreshToken);
 
         return new AuthResponseDto(
@@ -81,7 +76,6 @@ public class AuthService {
 
     @Transactional
     public TokenRefreshResponseDto refreshAccessToken(String refreshToken) {
-        // 1. 토큰 자체 유효성 검사
         if (!jwtTokenProvider.validateToken(refreshToken)) {
             throw new JwtException("Invalid Refresh Token");
         }

@@ -39,7 +39,7 @@ public class SearchService {
                 .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
-
+/*
     public List<SearchDto.SearchHistoryResponse> getSearchHistory(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
@@ -53,7 +53,7 @@ public class SearchService {
                         .build())
                 .collect(Collectors.toList());
     }
-
+*/
     @Transactional
     public void deleteAllSearchHistory(Long userId) {
         User user = userRepository.findById(userId)

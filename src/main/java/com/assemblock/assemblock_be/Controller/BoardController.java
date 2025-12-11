@@ -23,7 +23,6 @@ import java.util.Map;
 public class BoardController {
     private final BoardService boardService;
 
-    // 1. 내 보드 목록 조회
     @GetMapping
     public ResponseEntity<List<BoardListResponseDto>> getMyBoards(
             @AuthenticationPrincipal User user
@@ -32,7 +31,6 @@ public class BoardController {
         return ResponseEntity.ok(boards);
     }
 
-    // 2. 보드 생성
     @PostMapping
     public ResponseEntity<BoardDto.BoardDetailResponse> createBoard(
             @AuthenticationPrincipal User user,
@@ -42,7 +40,6 @@ public class BoardController {
         return ResponseEntity.created(URI.create("/api/boards/" + response.getBoardId())).body(response);
     }
 
-    // 3. 보드 상세 조회
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardDto.BoardDetailResponse> getBoardDetails(
             @AuthenticationPrincipal User user,
@@ -52,18 +49,17 @@ public class BoardController {
         return ResponseEntity.ok(boardDetail);
     }
 
-    // 4. 보드 수정
     @PutMapping("/{boardId}")
-    public ResponseEntity<Void> updateBoard(
+    public ResponseEntity<BoardDto.BoardDetailResponse> updateBoard(
             @AuthenticationPrincipal User user,
             @PathVariable Long boardId,
             @Valid @RequestBody BoardDto.BoardUpdateRequest request
     ) {
         boardService.updateBoard(user.getId(), boardId, request);
-        return ResponseEntity.ok().build();
+        BoardDto.BoardDetailResponse updatedBoard = boardService.getBoardDetails(user.getId(), boardId);
+        return ResponseEntity.ok(updatedBoard);
     }
 
-    // 5. 보드 삭제
     @DeleteMapping("/{boardId}")
     public ResponseEntity<Void> deleteBoard(
             @AuthenticationPrincipal User user,
@@ -73,7 +69,6 @@ public class BoardController {
         return ResponseEntity.noContent().build();
     }
 
-    // 6. 보드에 블록 추가
     @PostMapping("/{boardId}/blocks")
     public ResponseEntity<Void> addBlockToBoard(
             @AuthenticationPrincipal User user,
@@ -88,7 +83,6 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    // 7. 보드에서 블록 제거
     @DeleteMapping("/{boardId}/blocks/{blockId}")
     public ResponseEntity<Void> removeBlockFromBoard(
             @AuthenticationPrincipal User user,
@@ -98,7 +92,7 @@ public class BoardController {
         boardService.removeBlocksFromBoard(user.getId(), boardId, Collections.singletonList(blockId));
         return ResponseEntity.noContent().build();
     }
-
+/*
     @PostMapping("/proposals")
     public ResponseEntity<Void> createTeamProposal(
             @AuthenticationPrincipal User user,
@@ -108,7 +102,7 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-
+*/
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));

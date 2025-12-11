@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class SearchDto {
+    /**
     @Getter
     @Builder
     @NoArgsConstructor
@@ -14,4 +15,5 @@ public class SearchDto {
         private Long historyId;
         private String keyword;
     }
+    **/
 }
