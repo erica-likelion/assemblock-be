@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class ProposalCreateRequestDto {
-    private Long proposerId;
+
     private String discordId;
     private LocalDate recruitStartDate;
     private LocalDate recruitEndDate;

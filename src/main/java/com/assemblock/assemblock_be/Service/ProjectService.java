@@ -1,7 +1,9 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.ProjectMemberCreateRequestDto;
-import com.assemblock.assemblock_be.Dto.ProjectMemberResponseDto;
+// import com.assemblock.assemblock_be.Dto.ProjectMemberCreateRequestDto;
+// import com.assemblock.assemblock_be.Dto.ProjectMemberResponseDto;
+import com.assemblock.assemblock_be.Dto.ProjectDetailResponseDto;
+import com.assemblock.assemblock_be.Dto.ProjectMemberInfoResponseDto;
 import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.*;
 
@@ -56,6 +58,69 @@ public class ProjectService {
         projectMemberRepository.save(member);
     }
 
+    public ProjectDetailResponseDto getProjectDetail(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
+
+        // 멤버 리스트를 DTO로 변환
+        List<ProjectMemberInfoResponseDto> memberDtos = projectMemberRepository.findByProject_Id(projectId).stream()
+                .map(member -> ProjectMemberInfoResponseDto.builder()
+                        .userId(member.getUser().getId())
+                        .nickname(member.getUser().getNickname())
+                        .profileUrl(member.getUser().getPortfolioUrl()) // User 엔티티에 필드가 있다고 가정
+                        .isLeader(member.getIsProposer())
+                        .part(member.getMemberRole().name()) // Enum -> String
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProjectDetailResponseDto.builder()
+                .projectId(project.getId())
+                .projectTitle(project.getProposal().getProjectTitle()) // Proposal의 제목 사용
+                .status(project.getProjectStatus())
+                .members(memberDtos)
+                .build();
+    }
+
+    /**
+     * [기능 2] 진행 중인 프로젝트 목록 보기
+     * - 내가 속한 프로젝트 중 status가 'ongoing'인 것들
+     * - 각 프로젝트의 팀원 리스트 포함
+     */
+    public List<ProjectDetailResponseDto> getMyOngoingProjects(Long userId) {
+        // 1. 내가 속한 프로젝트 찾기
+        List<Project> myProjects = projectRepository.findProjectsByUserId(userId);
+
+        // 2. 'ongoing' 상태만 필터링 후 상세 정보(멤버포함) 변환
+        return myProjects.stream()
+                .filter(project -> project.getProjectStatus() == ProjectStatus.ongoing)
+                .map(project -> getProjectDetail(project.getId())) // 위에서 만든 상세 조회 메서드 재사용
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * [기능 3] 프로젝트 완료 처리
+     * - 프로젝트 팀장(Proposer)만 가능
+     * - status를 'done'으로 변경
+     */
+    @Transactional
+    public void completeProject(Long projectId, Long userId) {
+        // 1. 멤버 조회 (해당 프로젝트에 속해 있는지)
+        ProjectMember member = projectMemberRepository.findByProject_IdAndUser_Id(projectId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 프로젝트의 멤버가 아닙니다."));
+
+        // 2. 권한 확인 (팀장인지)
+        if (!member.getIsProposer()) {
+            throw new IllegalArgumentException("프로젝트 팀장만 완료 처리를 할 수 있습니다.");
+        }
+
+        // 3. 상태 변경
+        Project project = member.getProject();
+        project.setProjectStatus(ProjectStatus.done); // Setter 사용 (Entity에 @Setter가 있으므로 가능)
+
+        // save는 Transactional 안에서 Dirty Checking으로 자동 처리되지만 명시해도 무방
+        projectRepository.save(project);
+    }
+/*
     // 1) 내 프로젝트 조회
     public List<Project> getMyProjects(Long userId) {
         return projectRepository.findProjectsByUserId(userId);
@@ -68,22 +133,6 @@ public class ProjectService {
                 .filter(project -> project.getProjectStatus() == ProjectStatus.ongoing)
                 .map(project -> project.getProposal().getProjectTitle())
                 .collect(Collectors.toList());
-    }
-
-    // 3) 프로젝트 완료 처리
-    @Transactional
-    public void completeProject(Long projectId, Long userId) {
-        ProjectMember member = projectMemberRepository
-                .findByProject_IdAndUser_Id(projectId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("팀원이 아닙니다."));
-
-        if (!member.getIsProposer()) {
-            throw new IllegalArgumentException("제안자만 완료 가능");
-        }
-
-        Project project = member.getProject();
-        project.setProjectStatus(ProjectStatus.done);
-        projectRepository.save(project);
     }
 
     // 4) 멤버 추가
@@ -121,6 +170,19 @@ public class ProjectService {
                         .memberRole(member.getMemberRole().name())
                         .isProposer(member.getIsProposer())
                         .build())
+                .collect(Collectors.toList());
+    }
+
+ */
+
+    public List<ProjectDetailResponseDto> getMyCompletedProjects(Long userId) {
+        // 1. 내가 속한 프로젝트 찾기
+        List<Project> myProjects = projectRepository.findProjectsByUserId(userId);
+
+        // 2. 'done' 상태만 필터링 -> 상세 정보(멤버포함) 변환
+        return myProjects.stream()
+                .filter(project -> project.getProjectStatus() == ProjectStatus.done) // 완료된 것만 필터링
+                .map(project -> getProjectDetail(project.getId())) // 상세 조회 메서드 재사용
                 .collect(Collectors.toList());
     }
 }

@@ -134,7 +134,7 @@ public class BoardService {
                     .proposal(proposal)
                     .user(proposer)
                     .block(block)
-                    .responseStatus(ProposalStatus.pending)
+                    .responseStatus(ProposalStatus.PENDING)
                     .build();
             proposalTargetRepository.save(target);
         }

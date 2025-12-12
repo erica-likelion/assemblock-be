@@ -1,8 +1,9 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.ProjectMemberCreateRequestDto;
-import com.assemblock.assemblock_be.Dto.ProjectMemberResponseDto;
-import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Dto.ProjectDetailResponseDto;
+//import com.assemblock.assemblock_be.Dto.ProjectMemberCreateRequestDto;
+//import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ import java.util.Map;
 public class ProjectController {
 
     private final ProjectService projectService;
-
-    // 0. 프로젝트 생성 (제안 -> 프로젝트)
+/*
+    // 0. 프로젝트 생성 (기존 유지)
     @PostMapping
     public ResponseEntity<Void> createProject(
             @AuthenticationPrincipal User user,
@@ -32,38 +33,63 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    // 1. 내 프로젝트 조회
-    @GetMapping("/me")
-    public ResponseEntity<List<Project>> getMyProjects(
-            @AuthenticationPrincipal User user
+ */
+
+    /**
+     * [기능 1] 단일 프로젝트 상세 조회
+     * (상태, 멤버 리스트 포함)
+     */
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(
+            @PathVariable Long projectId
     ) {
-        Long currentUserId = user.getId();
-        List<Project> projects = projectService.getMyProjects(currentUserId);
-        return ResponseEntity.ok(projects);
+        ProjectDetailResponseDto response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
     }
 
-    // 2. 진행 중인 프로젝트 조회
+    /**
+     * [기능 2] 진행 중인 프로젝트 목록 조회 (팀원 리스트 포함)
+     * (기존 getOngoingProjects를 대체하거나 새로 추가)
+     */
     @GetMapping("/ongoing")
-    public ResponseEntity<List<String>> getOngoingProjects(
+    public ResponseEntity<List<ProjectDetailResponseDto>> getOngoingProjects(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
-        List<String> ongoingProjects = projectService.getOngoingProjects(currentUserId);
-        return ResponseEntity.ok(ongoingProjects);
+        List<ProjectDetailResponseDto> response = projectService.getMyOngoingProjects(user.getId());
+        return ResponseEntity.ok(response);
     }
 
-    // 3. 프로젝트 완료 처리
+    /**
+     * [기능 3] 프로젝트 완료 처리 (팀장만 가능)
+     */
     @PatchMapping("/{projectId}/complete")
     public ResponseEntity<Void> completeProject(
             @PathVariable Long projectId,
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
-        projectService.completeProject(projectId, currentUserId);
+        projectService.completeProject(projectId, user.getId());
         return ResponseEntity.ok().build();
     }
+/*
+    // [기타] 내 전체 프로젝트 조회 (기존 유지)
+    @GetMapping("/me")
+    public ResponseEntity<List<Project>> getMyProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(projectService.getMyProjects(user.getId()));
+    }
 
-    // 4. 프로젝트 멤버 추가
+ */
+
+    @GetMapping("/complete")
+    public ResponseEntity<List<ProjectDetailResponseDto>> getCompletedProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        List<ProjectDetailResponseDto> response = projectService.getMyCompletedProjects(user.getId());
+        return ResponseEntity.ok(response);
+    }
+/*
+    // [기타] 멤버 추가 (기존 유지)
     @PostMapping("/members")
     public ResponseEntity<Void> addProjectMember(
             @RequestBody ProjectMemberCreateRequestDto requestDto
@@ -72,11 +98,5 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{projectId}/members")
-    public ResponseEntity<List<ProjectMemberResponseDto>> getProjectMembers(
-            @PathVariable Long projectId
-    ) {
-        List<ProjectMemberResponseDto> members = projectService.getProjectMembers(projectId);
-        return ResponseEntity.ok(members);
-    }
+ */
 }

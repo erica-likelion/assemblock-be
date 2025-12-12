@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SearchService {
+    /*
     private final BlockRepository blockRepository;
     private final SearchHistoryRepository searchHistoryRepository;
     private final UserRepository userRepository;
@@ -39,21 +40,6 @@ public class SearchService {
                 .map(BlockResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
-/*
-    public List<SearchDto.SearchHistoryResponse> getSearchHistory(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        return searchHistoryRepository.findAllByUserOrderByCreatedAtDesc(user)
-                .stream()
-                .limit(10)
-                .map(history -> SearchDto.SearchHistoryResponse.builder()
-                        .historyId(history.getId())
-                        .keyword(history.getKeyword())
-                        .build())
-                .collect(Collectors.toList());
-    }
-*/
     @Transactional
     public void deleteAllSearchHistory(Long userId) {
         User user = userRepository.findById(userId)
@@ -67,4 +53,6 @@ public class SearchService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
         searchHistoryRepository.deleteByIdAndUser(historyId, user);
     }
+
+ */
 }

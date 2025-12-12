@@ -24,7 +24,7 @@ public class NotificationController {
         List<NotificationResponseDto> notifications = notificationService.getPendingNotifications(user.getId());
         return ResponseEntity.ok(notifications);
     }
-
+/*
     @PostMapping("/{proposalId}/accept")
     public ResponseEntity<Void> acceptProposal(
             @AuthenticationPrincipal User user,
@@ -42,4 +42,6 @@ public class NotificationController {
         notificationService.rejectProposal(user.getId(), proposalId);
         return ResponseEntity.ok().build();
     }
+
+ */
 }

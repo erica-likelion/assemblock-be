@@ -26,4 +26,6 @@ public class ProposalResponseDto {
     private String projectMemo;
     private LocalDateTime createdAt;
     private List<BlockResponseDto> targetBlocks;
+
+    private List<ProposalTargetDto> targets;
 }

@@ -1,6 +1,6 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.*;
+import com.assemblock.assemblock_be.Dto.NotificationResponseDto;
 import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,7 @@ public class NotificationService {
     private final UserRepository userRepository;
     private final BlockRepository blockRepository;
     private final ProposalTargetRepository proposalTargetRepository;
+    private final ProposalRepository proposalRepository;
 
     public List<NotificationResponseDto> getPendingNotifications(Long currentUserId) {
         User user = userRepository.findById(currentUserId)
@@ -29,7 +30,7 @@ public class NotificationService {
             return Collections.emptyList();
         }
 
-        List<ProposalTarget> targets = proposalTargetRepository.findAllByBlockInAndResponseStatus(myBlocks, ProposalStatus.pending);
+        List<ProposalTarget> targets = proposalTargetRepository.findAllByBlockInAndResponseStatus(myBlocks, ProposalStatus.PENDING);
 
         return targets.stream()
                 .map(ProposalTarget::getProposal)
@@ -49,16 +50,19 @@ public class NotificationService {
                 })
                 .collect(Collectors.toList());
     }
+    /*
 
     @Transactional
     public void acceptProposal(Long currentUserId, Long proposalId) throws AccessDeniedException {
-        updateProposalTargetsStatus(currentUserId, proposalId, ProposalStatus.accepted);
+        updateProposalTargetsStatus(currentUserId, proposalId, ProposalStatus.ACCEPTED);
     }
 
     @Transactional
     public void rejectProposal(Long currentUserId, Long proposalId) throws AccessDeniedException {
-        updateProposalTargetsStatus(currentUserId, proposalId, ProposalStatus.rejected);
+        updateProposalTargetsStatus(currentUserId, proposalId, ProposalStatus.REJECTED);
     }
+
+     */
 
     private void updateProposalTargetsStatus(Long currentUserId, Long proposalId, ProposalStatus newStatus)
             throws AccessDeniedException {
@@ -72,9 +76,9 @@ public class NotificationService {
             Long blockOwnerId = target.getBlock().getUser().getId();
 
             if (!blockOwnerId.equals(currentUserId)) {
-                throw new AccessDeniedException("이 제안을 처리할 권한이 없습니다.");
+                throw new IllegalArgumentException("이 제안을 처리할 권한이 없습니다.");
             }
-            if (target.getResponseStatus() != ProposalStatus.pending) {
+            if (target.getResponseStatus() != ProposalStatus.PENDING) {
                 throw new IllegalStateException("이미 처리된 제안이 포함되어 있습니다.");
             }
         }

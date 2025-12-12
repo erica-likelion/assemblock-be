@@ -17,10 +17,13 @@ import java.time.LocalDateTime;
         }
 )
 public class SearchHistory {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "history_id")
     private Long id;
+    /*
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -32,4 +35,7 @@ public class SearchHistory {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+     */
+
 }
