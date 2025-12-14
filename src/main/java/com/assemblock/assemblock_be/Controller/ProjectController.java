@@ -89,7 +89,6 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 /*
-    // [기타] 멤버 추가 (기존 유지)
     @PostMapping("/members")
     public ResponseEntity<Void> addProjectMember(
             @RequestBody ProjectMemberCreateRequestDto requestDto
