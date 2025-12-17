@@ -7,6 +7,7 @@ import com.assemblock.assemblock_be.Entity.ProposalTarget;
 import com.assemblock.assemblock_be.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,5 @@ public interface ProposalTargetRepository extends JpaRepository<ProposalTarget, 
     Optional<ProposalTarget> findByProposalAndUser(Proposal proposal, User user);
 
     long countByProposal(Proposal proposal);
+    List<ProposalTarget> findAllByProposal_RecruitEndDateBeforeAndResponseStatus(LocalDate date, ProposalStatus status);
 }

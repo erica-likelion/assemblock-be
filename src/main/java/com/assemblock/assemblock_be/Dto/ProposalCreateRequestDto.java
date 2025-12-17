@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class ProposalCreateRequestDto {
     private LocalDate recruitEndDate;
     private String projectTitle;
     private String projectMemo;
+    private List<Long> targetBlockIds;
 }
