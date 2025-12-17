@@ -4,15 +4,20 @@ import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.Block.BlockCategory;
 import com.assemblock.assemblock_be.Entity.Block.TechPart;
 import com.assemblock.assemblock_be.Entity.User;
+import org.springframework.data.jpa.repository.EntityGraph; // [필수]
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface BlockRepository extends JpaRepository<Block, Long> {
 
+    @Override
+    @EntityGraph(attributePaths = {"user"})
+    List<Block> findAll();
+
+    @EntityGraph(attributePaths = {"user"})
     @Query("SELECT b FROM Block b WHERE " +
             "(:category IS NULL OR b.categoryName = :category) AND " +
             "(:techPart IS NULL OR b.techPart = :techPart) AND " +
@@ -24,10 +29,13 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
             @Param("keyword") String keyword
     );
 
+    @EntityGraph(attributePaths = {"user"})
     List<Block> findAllByUser(User user);
+
+    @EntityGraph(attributePaths = {"user"})
     List<Block> findAllByUserAndBlockType(User user, Block.BlockType blockType);
-    List<Block> findAllByTechPart(TechPart techPart);
-    List<Block> findAllByCategoryNameOrderByCreatedAtDesc(BlockCategory categoryName);
-    List<Block> findAllByBlockTypeOrderByCreatedAtDesc(Block.BlockType blockType);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<Block> findAllByBlockType(Block.BlockType blockType);
 
 }

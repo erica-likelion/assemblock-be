@@ -1,5 +1,6 @@
 package com.assemblock.assemblock_be.Dto;
 
+import com.assemblock.assemblock_be.Entity.ProposalStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +9,8 @@ import lombok.Getter;
 public class ProjectMemberInfoResponseDto {
     private Long userId;
     private String nickname;
-    private String profileUrl; // 유저 프로필 이미지
-    private boolean isLeader;  // 팀장 여부 (isProposer)
-    private String part;       // 맡은 파트 (MemberRole)
+    private String profileUrl;
+    private boolean isLeader;
+    private String part;
+    private ProposalStatus status;
 }

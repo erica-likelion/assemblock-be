@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final ProposalRepository proposalRepository;
 
+    /*
     @Transactional
     public void createProject(Long userId, Long proposalId, String roleStr) {
         Proposal proposal = proposalRepository.findById(proposalId)
@@ -58,26 +60,58 @@ public class ProjectService {
         projectMemberRepository.save(member);
     }
 
+     */
+
     public ProjectDetailResponseDto getProjectDetail(Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("프로젝트를 찾을 수 없습니다."));
 
-        // 멤버 리스트를 DTO로 변환
-        List<ProjectMemberInfoResponseDto> memberDtos = projectMemberRepository.findByProject_Id(projectId).stream()
-                .map(member -> ProjectMemberInfoResponseDto.builder()
-                        .userId(member.getUser().getId())
-                        .nickname(member.getUser().getNickname())
-                        .profileUrl(member.getUser().getPortfolioUrl()) // User 엔티티에 필드가 있다고 가정
-                        .isLeader(member.getIsProposer())
-                        .part(member.getMemberRole().name()) // Enum -> String
-                        .build())
-                .collect(Collectors.toList());
+        Proposal proposal = project.getProposal(); // 프로젝트와 연결된 제안서
+
+        List<ProjectMemberInfoResponseDto> memberDtos = new ArrayList<>();
+
+        // 1. [팀장] 추가 (제안자는 항상 ACCEPTED)
+        User leader = proposal.getUser();
+        memberDtos.add(ProjectMemberInfoResponseDto.builder()
+                .userId(leader.getId())
+                .nickname(leader.getNickname())
+                .profileUrl(leader.getPortfolioUrl()) // 프로필 이미지
+                .isLeader(true)
+                .part("PM") // 혹은 leader.getProfileType() 등
+                .status(ProposalStatus.ACCEPTED) // 팀장은 항상 수락 상태
+                .build());
+
+        // 2. [팀원들] 추가 (대기중, 수락, 거절 모두 포함)
+        // ProposalTarget 리스트를 순회하면 모든 상태를 알 수 있습니다.
+        if (proposal.getTargets() != null) {
+            for (ProposalTarget target : proposal.getTargets()) {
+
+                // 블록 정보를 이용해 파트 이름 등 추출 (없으면 기본값)
+                String partName = "Member";
+                // if (target.getBlock() != null) partName = target.getBlock().getCategoryName();
+
+                memberDtos.add(ProjectMemberInfoResponseDto.builder()
+                        .userId(target.getUser().getId())
+                        .nickname(target.getUser().getNickname())
+                        .profileUrl(target.getUser().getPortfolioUrl())
+                        .isLeader(false)
+                        .part(partName)
+                        .status(target.getResponseStatus()) // [핵심] WAITING, ACCEPTED, REFUSED 상태가 여기에 들어감
+                        .build());
+            }
+        }
 
         return ProjectDetailResponseDto.builder()
                 .projectId(project.getId())
-                .projectTitle(project.getProposal().getProjectTitle()) // Proposal의 제목 사용
-                .status(project.getProjectStatus())
-                .members(memberDtos)
+                .projectTitle(proposal.getProjectTitle()) // Proposal의 제목 사용
+                .status(project.getProjectStatus()) // recruiting, ongoing, done
+
+                // 추가 정보들
+                .recruitStartDate(proposal.getRecruitStartDate())
+                .recruitEndDate(proposal.getRecruitEndDate())
+                .contact(proposal.getDiscordId())
+
+                .members(memberDtos) // 팀장 + (대기/수락/거절) 팀원 리스트
                 .build();
     }
 

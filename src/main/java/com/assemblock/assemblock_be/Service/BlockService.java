@@ -25,6 +25,31 @@ public class BlockService {
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
 
+    public List<BlockResponseDto> findAll(String blockTypeStr) {
+        List<Block> blocks;
+
+        // 1. 파라미터가 있으면 -> 해당 타입만 조회
+        if (blockTypeStr != null && !blockTypeStr.isEmpty()) {
+            try {
+                // 대소문자 구분 없이 처리하기 위해 toUpperCase 사용
+                Block.BlockType type = Block.BlockType.valueOf(blockTypeStr.toUpperCase());
+                blocks = blockRepository.findAllByBlockType(type);
+            } catch (IllegalArgumentException e) {
+                // 잘못된 타입(예: "ABC")이 들어오면 빈 리스트 반환 혹은 전체 반환 (여기선 빈 리스트)
+                return List.of();
+            }
+        }
+        // 2. 파라미터가 없으면 -> 전체 조회
+        else {
+            blocks = blockRepository.findAll();
+        }
+
+        // DTO 변환 후 반환
+        return blocks.stream()
+                .map(BlockResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public Long createBlock(Long userId, BlockDto requestDto) {
         User user = userRepository.findById(userId)

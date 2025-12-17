@@ -4,7 +4,7 @@ import com.assemblock.assemblock_be.Dto.ProposalCreateRequestDto;
 import com.assemblock.assemblock_be.Dto.ProposalResponseDto;
 import com.assemblock.assemblock_be.Dto.ProposalListDto;
 import com.assemblock.assemblock_be.Dto.ProposalTargetUpdateRequestDto;
-import com.assemblock.assemblock_be.Entity.Proposal;
+//import com.assemblock.assemblock_be.Entity.Proposal;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.ProposalService;
 import lombok.RequiredArgsConstructor;

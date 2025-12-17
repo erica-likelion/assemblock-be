@@ -2,7 +2,7 @@ package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
+// import com.assemblock.assemblock_be.Dto.BlockListResponseDto; // 안 쓰면 삭제
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
@@ -32,7 +32,6 @@ public class BlockController {
             @AuthenticationPrincipal User user
     ) {
         Long blockId = blockService.createBlock(user.getId(), requestDto);
-
         BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
         return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).body(responseDto);
     }
@@ -74,15 +73,16 @@ public class BlockController {
     }
 
     /**
-     * 5. 블록 목록 조회/검색 (GET)
+     * 5. [수정됨] 블록 목록 조회 (GET)
+     * - 기존 getBlockList 삭제함 (충돌 해결)
+     * - blockType 파라미터로 필터링 가능
      */
     @GetMapping
-    public ResponseEntity<List<BlockListResponseDto>> getBlockList(
-            @RequestParam(required = false) Optional<Block.BlockCategory> category,
-            @RequestParam(required = false) Optional<Block.TechPart> techPart,
-            @RequestParam(required = false) String keyword
+    public ResponseEntity<List<BlockResponseDto>> findAll(
+            @RequestParam(name = "blockType", required = false) String blockType
     ) {
-        List<BlockListResponseDto> response = blockService.getBlockList(category, techPart, keyword);
-        return ResponseEntity.ok(response);
+        // Service에서 blockType에 따라 필터링하거나 전체를 반환함
+        List<BlockResponseDto> blocks = blockService.findAll(blockType);
+        return ResponseEntity.ok(blocks);
     }
 }
