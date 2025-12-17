@@ -55,6 +55,9 @@ public class ProposalService {
             for (BoardBlock boardBlock : boardBlocks) {
                 Block block = boardBlock.getBlock();
 
+                if (block.getUser().getId().equals(userId)) {
+                    continue;
+                }
 
                 ProposalTarget target = ProposalTarget.builder()
                         .proposal(savedProposal)
