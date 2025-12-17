@@ -25,6 +25,7 @@ public class ProposalService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final BoardRepository boardRepository;
 
     // [필수 추가] 이 줄이 없어서 에러가 났습니다.
     private final BlockRepository blockRepository;
@@ -35,7 +36,10 @@ public class ProposalService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
-        // 1-1. 제안서 생성
+        Board board = boardRepository.findById(dto.getBoardId())
+                .orElseThrow(() -> new IllegalArgumentException("보드를 찾을 수 없습니다."));
+
+        // 제안서 생성
         Proposal proposal = Proposal.builder()
                 .user(user)
                 .discordId(dto.getDiscordId())
@@ -46,21 +50,25 @@ public class ProposalService {
                 .build();
         Proposal savedProposal = proposalRepository.save(proposal);
 
-        if (dto.getTargetBlockIds() != null && !dto.getTargetBlockIds().isEmpty()) {
-            List<Block> targetBlocks = blockRepository.findAllById(dto.getTargetBlockIds());
+        List<BoardBlock> boardBlocks = board.getBoardBlocks();
 
-            for (Block block : targetBlocks) {
+        if (boardBlocks != null && !boardBlocks.isEmpty()) {
+            for (BoardBlock boardBlock : boardBlocks) {
+                Block block = boardBlock.getBlock();
+
+
                 ProposalTarget target = ProposalTarget.builder()
                         .proposal(savedProposal)
                         .block(block)
-                        .user(block.getUser()) // 블록 주인에게 제안
-                        .responseStatus(ProposalStatus.PENDING) // 대기 상태
+                        .user(block.getUser())
+                        .responseStatus(ProposalStatus.PENDING)
                         .build();
                 proposalTargetRepository.save(target);
             }
+        } else {
+            throw new IllegalArgumentException("보드에 블록이 하나도 없습니다.");
         }
 
-        // 프로젝트 자동 생성 (RECRUITING)
         Project project = new Project(savedProposal, user);
         Project savedProject = projectRepository.save(project);
 

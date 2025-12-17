@@ -21,5 +21,5 @@ public class ProposalCreateRequestDto {
     private LocalDate recruitEndDate;
     private String projectTitle;
     private String projectMemo;
-    private List<Long> targetBlockIds;
+    private Long boardId;
 }
