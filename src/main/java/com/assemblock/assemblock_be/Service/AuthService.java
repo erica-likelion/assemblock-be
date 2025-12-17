@@ -49,7 +49,7 @@ public class AuthService {
         if (isNewUser) {
             user = User.builder()
                     .kakaoId(kakaoId)
-                    .nickname("User_" + kakaoId) // 닉네임 guest1234 -> user1234로 변경
+                    .nickname("User_" + kakaoId)
                     .build();
             userRepository.save(user);
         } else {

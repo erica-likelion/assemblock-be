@@ -1,7 +1,7 @@
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.ReviewRequestDto;
-import com.assemblock.assemblock_be.Dto.ReviewResponseDto; // [필수] DTO Import
+import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
 import com.assemblock.assemblock_be.Entity.*;
 import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;

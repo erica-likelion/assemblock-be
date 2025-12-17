@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class ProposalTargetDto {
     private Long userId;
     private String nickname;
-    private String blockTitle;      // 어떤 블록으로 참여했는지
-    private ProposalStatus status;  // [핵심] WAITING, ACCEPTED, REFUSED
+    private String blockTitle;
+    private ProposalStatus status;  // WAITING, ACCEPTED, REFUSED
 }

@@ -49,14 +49,6 @@ public class ProposalController {
         proposalService.delete(proposalId);
         return ResponseEntity.ok().build();
     }
-/*
-    @GetMapping("/all")
-    public ResponseEntity<List<Proposal>> getAllProposals() {
-        List<Proposal> proposals = proposalService.findAll();
-        return ResponseEntity.ok(proposals);
-    }
-
- */
 
     @PatchMapping("/{proposalId}/response")
     public ResponseEntity<ProposalResponseDto> respondToProposal(

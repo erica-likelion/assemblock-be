@@ -27,10 +27,9 @@ public class ProposalService {
     private final ProjectMemberRepository projectMemberRepository;
     private final BoardRepository boardRepository;
 
-    // [필수 추가] 이 줄이 없어서 에러가 났습니다.
     private final BlockRepository blockRepository;
 
-    // 1. 제안 생성 + 타겟 블록 저장 + 프로젝트 자동 생성 + 제안자 멤버 등록
+    // 제안 생성 + 타겟 블록 저장 + 프로젝트 자동 생성 + 제안자 멤버 등록
     @Transactional
     public ProposalResponseDto createProposal(Long userId, ProposalCreateRequestDto dto) {
         User user = userRepository.findById(userId)
@@ -83,7 +82,7 @@ public class ProposalService {
         );
         projectMemberRepository.save(proposerMember);
 
-        // 저장된 제안서의 상세 정보를 반환 (타겟 정보 포함)
+        // 저장된 제안의 상세 정보를 반환
         return getProposalDetail(savedProposal.getId());
     }
 
@@ -91,7 +90,7 @@ public class ProposalService {
     public void autoRefuseOverdueTargets() {
         LocalDate today = LocalDate.now();
 
-        // 1. 마감일이 어제까지였는데(오늘 기준 마감일 < 오늘) 아직 PENDING인 타겟들 조회
+        // 마감일이 지났는데 아직 PENDING인 타겟들 조회
         List<ProposalTarget> overdueTargets = proposalTargetRepository
                 .findAllByProposal_RecruitEndDateBeforeAndResponseStatus(today, ProposalStatus.PENDING);
 
@@ -100,14 +99,13 @@ public class ProposalService {
         }
 
         for (ProposalTarget target : overdueTargets) {
-            // 2. 상태를 REFUSED로 변경
             target.setResponseStatus(ProposalStatus.REJECTED);
 
             checkAndStartProject(target.getProposal());
         }
     }
 
-    // 2. 제안 상세 조회
+    // 제안 상세 조회
     public ProposalResponseDto getProposalDetail(Long id) {
         Proposal proposal = proposalRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));

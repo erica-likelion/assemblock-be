@@ -92,17 +92,7 @@ public class BoardController {
         boardService.removeBlocksFromBoard(user.getId(), boardId, Collections.singletonList(blockId));
         return ResponseEntity.noContent().build();
     }
-/*
-    @PostMapping("/proposals")
-    public ResponseEntity<Void> createTeamProposal(
-            @AuthenticationPrincipal User user,
-            @RequestBody BoardDto.TeamProposalRequest requestDto
-    ) {
-        boardService.createTeamProposal(user.getId(), requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
 
-*/
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", e.getMessage()));

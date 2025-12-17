@@ -2,8 +2,6 @@ package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-// import com.assemblock.assemblock_be.Dto.BlockListResponseDto; // 안 쓰면 삭제
-import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
 import jakarta.validation.Valid;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/blocks")
@@ -81,7 +78,6 @@ public class BlockController {
     public ResponseEntity<List<BlockResponseDto>> findAll(
             @RequestParam(name = "blockType", required = false) String blockType
     ) {
-        // Service에서 blockType에 따라 필터링하거나 전체를 반환함
         List<BlockResponseDto> blocks = blockService.findAll(blockType);
         return ResponseEntity.ok(blocks);
     }

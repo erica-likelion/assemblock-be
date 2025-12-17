@@ -1,6 +1,5 @@
 package com.assemblock.assemblock_be.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import com.assemblock.assemblock_be.Entity.Project;
@@ -9,8 +8,6 @@ import com.assemblock.assemblock_be.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, Long> {
-
-    List<ProjectMember> findByProject_Id(Long projectId);
 
     Optional<ProjectMember> findByProject_IdAndUser_Id(Long projectId, Long userId);
 

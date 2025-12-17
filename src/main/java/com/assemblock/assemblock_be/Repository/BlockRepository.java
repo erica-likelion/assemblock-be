@@ -4,7 +4,7 @@ import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.Block.BlockCategory;
 import com.assemblock.assemblock_be.Entity.Block.TechPart;
 import com.assemblock.assemblock_be.Entity.User;
-import org.springframework.data.jpa.repository.EntityGraph; // [필수]
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
