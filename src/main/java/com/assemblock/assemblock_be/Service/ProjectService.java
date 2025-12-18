@@ -34,7 +34,7 @@ public class ProjectService {
         memberDtos.add(ProjectMemberInfoResponseDto.builder()
                 .userId(leader.getId())
                 .nickname(leader.getNickname())
-                .profileUrl(leader.getPortfolioUrl()) // 프로필 이미지
+                .profileType(leader.getProfileType())
                 .isLeader(true)
                 .part("PM") // 혹은 leader.getProfileType() 등
                 .status(ProposalStatus.ACCEPTED) // 팀장은 항상 수락 상태
@@ -49,7 +49,7 @@ public class ProjectService {
                 memberDtos.add(ProjectMemberInfoResponseDto.builder()
                         .userId(target.getUser().getId())
                         .nickname(target.getUser().getNickname())
-                        .profileUrl(target.getUser().getPortfolioUrl())
+                        .profileType(target.getUser().getProfileType())
                         .isLeader(false)
                         .part(partName)
                         .status(target.getResponseStatus())
