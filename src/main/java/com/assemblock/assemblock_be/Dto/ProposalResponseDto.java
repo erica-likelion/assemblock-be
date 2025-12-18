@@ -1,5 +1,7 @@
 package com.assemblock.assemblock_be.Dto;
 
+import com.assemblock.assemblock_be.Entity.UserProfileType;
+import com.assemblock.assemblock_be.Entity.Role;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -19,8 +21,8 @@ public class ProposalResponseDto {
     private Long proposalId;
     private Long proposerId;
     private String proposerNickname;
-    private String proposerProfileType;
-    private String proposerTechPart;
+    private UserProfileType proposerProfileType;
+    private String proposerRole;
     private String discordId;
     private LocalDate recruitStartDate;
     private LocalDate recruitEndDate;

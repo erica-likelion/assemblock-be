@@ -113,6 +113,15 @@ public class ProposalService {
         Proposal proposal = proposalRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("제안을 찾을 수 없습니다."));
 
+        User proposer = proposal.getUser();
+
+        String proposerRoleStr = "Unknown";
+        if (proposer.getRoles() != null && !proposer.getRoles().isEmpty()) {
+            proposerRoleStr = proposer.getRoles().stream()
+                    .map(role -> role.getValue())
+                    .collect(Collectors.joining(", "));
+        }
+
         List<ProposalTargetDto> targetDtos = proposal.getTargets().stream()
                 .map(target -> ProposalTargetDto.builder()
                         .userId(target.getUser().getId())
@@ -126,6 +135,8 @@ public class ProposalService {
                 .proposalId(proposal.getId())
                 .proposerId(proposal.getUser().getId())
                 .proposerNickname(proposal.getUser().getNickname())
+                .proposerProfileType(proposer.getProfileType())
+                .proposerRole(proposerRoleStr)
                 .discordId(proposal.getDiscordId())
                 .recruitStartDate(proposal.getRecruitStartDate())
                 .recruitEndDate(proposal.getRecruitEndDate())
