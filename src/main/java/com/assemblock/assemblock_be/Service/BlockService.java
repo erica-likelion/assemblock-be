@@ -2,7 +2,6 @@ package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
@@ -13,7 +12,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public List<BlockResponseDto> findBlocks(
@@ -64,8 +66,7 @@ public class BlockService {
             } catch (IllegalArgumentException e) {
                 return List.of();
             }
-        }
-        else {
+        } else {
             blocks = blockRepository.findAll();
         }
 
@@ -75,11 +76,19 @@ public class BlockService {
     }
 
     @Transactional
-    public Long createBlock(Long userId, BlockDto requestDto) {
+    public Long createBlock(Long userId, BlockDto requestDto, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         validateBlockTypeRequirements(requestDto);
+
+        String fileUrl = null;
+        String originalFileName = null;
+
+        if (file != null && !file.isEmpty()) {
+            fileUrl = s3Service.uploadFile(file);
+            originalFileName = file.getOriginalFilename();
+        }
 
         Block block = Block.builder()
                 .user(user)
@@ -92,7 +101,8 @@ public class BlockService {
                 .oneLineSummary(requestDto.getOneLineSummary())
                 .improvementPoint(requestDto.getImprovementPoint())
                 .resultUrl(requestDto.getResultUrl())
-                .resultFile(requestDto.getResultFile())
+                .resultFile(fileUrl)
+                .resultFileName(originalFileName)
                 .build();
 
         blockRepository.save(block);
@@ -109,7 +119,7 @@ public class BlockService {
     }
 
     @Transactional
-    public void updateBlock(Long userId, Long blockId, BlockDto requestDto) {
+    public void updateBlock(Long userId, Long blockId, BlockDto requestDto, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -122,7 +132,18 @@ public class BlockService {
 
         validateBlockTypeRequirements(requestDto);
 
-        block.update(requestDto);
+        String fileUrl = block.getResultFile();
+        String originalFileName = block.getResultFileName();
+
+        if (file != null && !file.isEmpty()) {
+            if (StringUtils.hasText(fileUrl)) {
+                s3Service.deleteFile(fileUrl);
+            }
+            fileUrl = s3Service.uploadFile(file);
+            originalFileName = file.getOriginalFilename();
+        }
+
+        block.update(requestDto, fileUrl, originalFileName);
     }
 
     @Transactional
@@ -135,6 +156,10 @@ public class BlockService {
 
         if (!block.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("User does not have permission to delete this block");
+        }
+
+        if (StringUtils.hasText(block.getResultFile())) {
+            s3Service.deleteFile(block.getResultFile());
         }
 
         blockRepository.delete(block);

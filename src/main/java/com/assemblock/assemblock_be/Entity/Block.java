@@ -61,7 +61,8 @@ public class Block extends BaseTime {
     @Column(name = "result_file", length = 2048)
     private String resultFile;
 
-
+    @Column(name = "result_file_name")
+    private String resultFileName;
 
 
     public enum BlockCategory {
@@ -98,7 +99,7 @@ public class Block extends BaseTime {
         this.resultFile = dto.getResultFile();
     }
 
-    public void update(BlockDto dto) {
+    public void update(BlockDto dto, String resultFile, String resultFileName) {
         this.techPart = dto.getTechPart();
         this.categoryName = dto.getCategoryName();
         this.blockTitle = dto.getBlockTitle();
@@ -108,6 +109,7 @@ public class Block extends BaseTime {
         this.oneLineSummary = dto.getOneLineSummary();
         this.improvementPoint = dto.getImprovementPoint();
         this.resultUrl = dto.getResultUrl();
-        this.resultFile = dto.getResultFile();
+        this.resultFile = resultFile;
+        this.resultFileName = resultFileName;
     }
 }

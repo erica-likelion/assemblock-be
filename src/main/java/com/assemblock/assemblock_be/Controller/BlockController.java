@@ -7,10 +7,13 @@ import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -21,22 +24,17 @@ public class BlockController {
 
     private final BlockService blockService;
 
-    /**
-     * 1. 블록 생성 (POST)
-     */
-    @PostMapping
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<BlockResponseDto> createBlock(
-            @Valid @RequestBody BlockDto requestDto,
+            @RequestPart(value = "dto") @Valid BlockDto requestDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
-    ) {
-        Long blockId = blockService.createBlock(user.getId(), requestDto);
+    ) throws IOException {
+        Long blockId = blockService.createBlock(user.getId(), requestDto, file);
         BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
         return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).body(responseDto);
     }
 
-    /**
-     * 2. 블록 상세 조회 (GET)
-     */
     @GetMapping("/{blockId}")
     public ResponseEntity<BlockResponseDto> getBlockDetail(
             @PathVariable Long blockId
@@ -45,22 +43,17 @@ public class BlockController {
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * 3. 블록 수정 (PUT)
-     */
-    @PutMapping("/{blockId}")
+    @PutMapping(value = "/{blockId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> updateBlock(
             @PathVariable Long blockId,
-            @Valid @RequestBody BlockDto requestDto,
+            @RequestPart(value = "dto") @Valid BlockDto requestDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
-    ) {
-        blockService.updateBlock(user.getId(), blockId, requestDto);
+    ) throws IOException {
+        blockService.updateBlock(user.getId(), blockId, requestDto, file);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 4. 블록 삭제 (DELETE)
-     */
     @DeleteMapping("/{blockId}")
     public ResponseEntity<Void> deleteBlock(
             @PathVariable Long blockId,
@@ -70,11 +63,6 @@ public class BlockController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * 5. [수정됨] 블록 목록 조회 (GET)
-     * - 기존 getBlockList 삭제함 (충돌 해결)
-     * - blockType 파라미터로 필터링 가능
-     */
     @GetMapping
     public ResponseEntity<List<BlockResponseDto>> findBlocks(
             @RequestParam(required = false) String blockType,

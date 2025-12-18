@@ -22,6 +22,7 @@ public class BlockResponseDto {
     private String improvementPoint;
     private String resultUrl;
     private String resultFile;
+    private String resultFileName;
 
 
     private Long writerId;
@@ -43,6 +44,7 @@ public class BlockResponseDto {
         this.improvementPoint = block.getImprovementPoint();
         this.resultUrl = block.getResultUrl();
         this.resultFile = block.getResultFile();
+        this.resultFileName = block.getResultFileName();
 
         if (block.getUser() != null) {
             this.writerId = block.getUser().getId();
