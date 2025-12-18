@@ -2,6 +2,7 @@ package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
+import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
 import jakarta.validation.Valid;
@@ -75,10 +76,13 @@ public class BlockController {
      * - blockType 파라미터로 필터링 가능
      */
     @GetMapping
-    public ResponseEntity<List<BlockResponseDto>> findAll(
-            @RequestParam(name = "blockType", required = false) String blockType
+    public ResponseEntity<List<BlockResponseDto>> findBlocks(
+            @RequestParam(required = false) String blockType,
+            @RequestParam(required = false) Block.BlockCategory category,
+            @RequestParam(required = false) Block.TechPart techPart,
+            @RequestParam(required = false) String keyword
     ) {
-        List<BlockResponseDto> blocks = blockService.findAll(blockType);
-        return ResponseEntity.ok(blocks);
+        List<BlockResponseDto> response = blockService.findBlocks(blockType, category, techPart, keyword);
+        return ResponseEntity.ok(response);
     }
 }
