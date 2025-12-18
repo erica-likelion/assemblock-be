@@ -46,4 +46,8 @@ public class Block {
 
     @Column(name = "result_file")
     private String resultFile;
+
+    @Column(name = "result_file_name")
+    private String resultFileName;
+
 }
