@@ -29,11 +29,6 @@ public class MyPageService {
     private final ReviewRepository reviewRepository;
     private final ProjectMemberRepository projectMemberRepository;
 
-    public MyProfileResponseDto getMyProfile(Long currentUserId) {
-        User user = findUserById(currentUserId);
-        return MyProfileResponseDto.fromEntity(user);
-    }
-
     @Transactional
     public MyProfileResponseDto updateMyProfile(Long currentUserId, ProfileUpdateRequestDto requestDto) {
         User user = findUserById(currentUserId);

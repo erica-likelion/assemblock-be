@@ -1,8 +1,7 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Dto.ProjectMemberCreateRequestDto;
-import com.assemblock.assemblock_be.Dto.ProjectMemberResponseDto;
-import com.assemblock.assemblock_be.Entity.*;
+import com.assemblock.assemblock_be.Dto.ProjectDetailResponseDto;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +9,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,64 +17,39 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    // 0. 프로젝트 생성 (제안 -> 프로젝트)
-    @PostMapping
-    public ResponseEntity<Void> createProject(
-            @AuthenticationPrincipal User user,
-            @RequestBody Map<String, Object> request
+     // 단일 프로젝트 상세 조회
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(
+            @PathVariable Long projectId
     ) {
-        Long proposalId = Long.valueOf(request.get("proposalId").toString());
-        String memberRole = (String) request.get("memberRole");
-
-        projectService.createProject(user.getId(), proposalId, memberRole);
-        return ResponseEntity.ok().build();
+        ProjectDetailResponseDto response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
     }
 
-    // 1. 내 프로젝트 조회
-    @GetMapping("/me")
-    public ResponseEntity<List<Project>> getMyProjects(
-            @AuthenticationPrincipal User user
-    ) {
-        Long currentUserId = user.getId();
-        List<Project> projects = projectService.getMyProjects(currentUserId);
-        return ResponseEntity.ok(projects);
-    }
-
-    // 2. 진행 중인 프로젝트 조회
+    // 진행 중인 프로젝트 목록 조회 (팀원 리스트 포함)
     @GetMapping("/ongoing")
-    public ResponseEntity<List<String>> getOngoingProjects(
+    public ResponseEntity<List<ProjectDetailResponseDto>> getOngoingProjects(
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
-        List<String> ongoingProjects = projectService.getOngoingProjects(currentUserId);
-        return ResponseEntity.ok(ongoingProjects);
+        List<ProjectDetailResponseDto> response = projectService.getMyOngoingProjects(user.getId());
+        return ResponseEntity.ok(response);
     }
 
-    // 3. 프로젝트 완료 처리
+    // 프로젝트 완료 처리 (팀장만 가능)
     @PatchMapping("/{projectId}/complete")
     public ResponseEntity<Void> completeProject(
             @PathVariable Long projectId,
             @AuthenticationPrincipal User user
     ) {
-        Long currentUserId = user.getId();
-        projectService.completeProject(projectId, currentUserId);
+        projectService.completeProject(projectId, user.getId());
         return ResponseEntity.ok().build();
     }
 
-    // 4. 프로젝트 멤버 추가
-    @PostMapping("/members")
-    public ResponseEntity<Void> addProjectMember(
-            @RequestBody ProjectMemberCreateRequestDto requestDto
+    @GetMapping("/complete")
+    public ResponseEntity<List<ProjectDetailResponseDto>> getCompletedProjects(
+            @AuthenticationPrincipal User user
     ) {
-        projectService.addProjectMember(requestDto);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/{projectId}/members")
-    public ResponseEntity<List<ProjectMemberResponseDto>> getProjectMembers(
-            @PathVariable Long projectId
-    ) {
-        List<ProjectMemberResponseDto> members = projectService.getProjectMembers(projectId);
-        return ResponseEntity.ok(members);
+        List<ProjectDetailResponseDto> response = projectService.getMyCompletedProjects(user.getId());
+        return ResponseEntity.ok(response);
     }
 }

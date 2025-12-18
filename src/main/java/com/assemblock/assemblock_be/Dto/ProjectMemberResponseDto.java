@@ -17,4 +17,5 @@ public class ProjectMemberResponseDto {
     private Long userId;
     private String memberRole;
     private boolean isProposer;
+
 }

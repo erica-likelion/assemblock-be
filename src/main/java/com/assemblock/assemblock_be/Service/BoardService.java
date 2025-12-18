@@ -105,40 +105,6 @@ public class BoardService {
         boardBlockRepository.deleteByBoardAndBlockIn(board, blocks);
     }
 
-    @Transactional
-    public void createTeamProposal(Long userId, BoardDto.TeamProposalRequest requestDto) {
-        User proposer = findUserById(userId);
-
-        String[] dates = requestDto.getRecruitingPeriod().split("~");
-        if (dates.length != 2) {
-            throw new IllegalArgumentException("날짜 형식이 올바르지 않습니다.");
-        }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        LocalDate startDate = LocalDate.parse(dates[0].trim(), formatter);
-        LocalDate endDate = LocalDate.parse(dates[1].trim(), formatter);
-
-        Proposal proposal = Proposal.builder()
-                .user(proposer)
-                .projectTitle(requestDto.getProjectTitle())
-                .projectMemo(requestDto.getMemo())
-                .discordId(requestDto.getContact())
-                .recruitStartDate(startDate)
-                .recruitEndDate(endDate)
-                .build();
-        proposalRepository.save(proposal);
-
-        List<Block> targetBlocks = blockRepository.findAllById(requestDto.getTargetBlockIds());
-        for (Block block : targetBlocks) {
-            ProposalTarget target = ProposalTarget.builder()
-                    .proposal(proposal)
-                    .user(proposer)
-                    .block(block)
-                    .responseStatus(ProposalStatus.pending)
-                    .build();
-            proposalTargetRepository.save(target);
-        }
-    }
 
     private User findUserById(Long userId) {
         return userRepository.findById(userId)

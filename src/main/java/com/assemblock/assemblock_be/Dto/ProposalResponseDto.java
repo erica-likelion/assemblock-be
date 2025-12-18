@@ -19,6 +19,8 @@ public class ProposalResponseDto {
     private Long proposalId;
     private Long proposerId;
     private String proposerNickname;
+    private String proposerProfileType;
+    private String proposerTechPart;
     private String discordId;
     private LocalDate recruitStartDate;
     private LocalDate recruitEndDate;
@@ -26,4 +28,6 @@ public class ProposalResponseDto {
     private String projectMemo;
     private LocalDateTime createdAt;
     private List<BlockResponseDto> targetBlocks;
+
+    private List<ProposalTargetDto> targets;
 }

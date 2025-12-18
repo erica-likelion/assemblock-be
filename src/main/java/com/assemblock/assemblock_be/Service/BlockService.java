@@ -3,20 +3,20 @@ package com.assemblock.assemblock_be.Service;
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
 import com.assemblock.assemblock_be.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,14 +25,32 @@ public class BlockService {
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
 
+    public List<BlockResponseDto> findAll(String blockTypeStr) {
+        List<Block> blocks;
+
+        if (blockTypeStr != null && !blockTypeStr.isEmpty()) {
+            try {
+                Block.BlockType type = Block.BlockType.valueOf(blockTypeStr.toUpperCase());
+                blocks = blockRepository.findAllByBlockType(type);
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+        else {
+            blocks = blockRepository.findAll();
+        }
+
+        return blocks.stream()
+                .map(BlockResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public Long createBlock(Long userId, BlockDto requestDto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (blockRepository.findByUserAndBlockTitle(user, requestDto.getBlockTitle()).isPresent()) {
-            throw new IllegalArgumentException("이미 동일한 제목의 블록이 존재합니다.");
-        }
+        validateBlockTypeRequirements(requestDto);
 
         Block block = Block.builder()
                 .user(user)
@@ -73,11 +91,7 @@ public class BlockService {
             throw new AccessDeniedException("User does not have permission to update this block");
         }
 
-        if (!block.getBlockTitle().equals(requestDto.getBlockTitle())) {
-            if (blockRepository.findByUserAndBlockTitle(user, requestDto.getBlockTitle()).isPresent()) {
-                throw new IllegalArgumentException("이미 동일한 제목의 블록이 존재합니다.");
-            }
-        }
+        validateBlockTypeRequirements(requestDto);
 
         block.update(requestDto);
     }
@@ -98,29 +112,30 @@ public class BlockService {
     }
 
     @Transactional(readOnly = true)
-    public BlockPagingResponseDto<BlockListResponseDto> getBlockList(
+    public List<BlockListResponseDto> getBlockList(
             Optional<Block.BlockCategory> category,
             Optional<Block.TechPart> techPart,
-            String keyword,
-            Pageable pageable) {
+            String keyword) {
 
-        Page<Block> blockPage;
+        String finalKeyword = (keyword != null && !keyword.isEmpty()) ? keyword : null;
 
-        boolean hasKeyword = keyword != null && !keyword.isEmpty();
+        List<Block> blocks = blockRepository.findBlocksDynamic(
+                category.orElse(null),
+                techPart.orElse(null),
+                finalKeyword
+        );
 
-        if (category.isPresent() && techPart.isPresent() && hasKeyword) {
-            blockPage = blockRepository.findAllByCategoryNameAndTechPartAndBlockTitleContaining(
-                    category.get(),
-                    techPart.get(),
-                    keyword,
-                    pageable);
-        } else {
-            String finalKeyword = hasKeyword ? keyword : "";
-            blockPage = blockRepository.findAllByBlockTitleContaining(finalKeyword, pageable);
+        return blocks.stream().map(BlockListResponseDto::new).collect(Collectors.toList());
+    }
+
+    private void validateBlockTypeRequirements(BlockDto dto) {
+        if (dto.getBlockType() == Block.BlockType.TECHNOLOGY) {
+            if (dto.getTechPart() == null) {
+                throw new IllegalArgumentException("TECHNOLOGY 타입은 기술 파트(techPart)가 필수입니다.");
+            }
+            if (!StringUtils.hasText(dto.getToolsText())) {
+                throw new IllegalArgumentException("TECHNOLOGY 타입은 툴 설명(toolsText)이 필수입니다.");
+            }
         }
-
-        Page<BlockListResponseDto> dtoPage = blockPage.map(BlockListResponseDto::new);
-
-        return new BlockPagingResponseDto<>(dtoPage);
     }
 }

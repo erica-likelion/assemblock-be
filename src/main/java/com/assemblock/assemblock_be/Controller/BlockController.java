@@ -2,21 +2,16 @@ package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponseDto;
-import com.assemblock.assemblock_be.Dto.BlockListResponseDto;
-import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/blocks")
@@ -29,13 +24,13 @@ public class BlockController {
      * 1. 블록 생성 (POST)
      */
     @PostMapping
-    public ResponseEntity<Void> createBlock(
+    public ResponseEntity<BlockResponseDto> createBlock(
             @Valid @RequestBody BlockDto requestDto,
             @AuthenticationPrincipal User user
     ) {
         Long blockId = blockService.createBlock(user.getId(), requestDto);
-
-        return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).build();
+        BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
+        return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).body(responseDto);
     }
 
     /**
@@ -43,7 +38,7 @@ public class BlockController {
      */
     @GetMapping("/{blockId}")
     public ResponseEntity<BlockResponseDto> getBlockDetail(
-                                                         @PathVariable Long blockId
+            @PathVariable Long blockId
     ) {
         BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
         return ResponseEntity.ok(responseDto);
@@ -75,16 +70,15 @@ public class BlockController {
     }
 
     /**
-     * 5. 블록 목록 조회/검색 (GET) - 신규
+     * 5. [수정됨] 블록 목록 조회 (GET)
+     * - 기존 getBlockList 삭제함 (충돌 해결)
+     * - blockType 파라미터로 필터링 가능
      */
     @GetMapping
-    public ResponseEntity<BlockPagingResponseDto<BlockListResponseDto>> getBlockList(
-            @RequestParam(required = false) Optional<Block.BlockCategory> category,
-            @RequestParam(required = false) Optional<Block.TechPart> techPart,
-            @RequestParam(required = false) String keyword,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
+    public ResponseEntity<List<BlockResponseDto>> findAll(
+            @RequestParam(name = "blockType", required = false) String blockType
     ) {
-        BlockPagingResponseDto<BlockListResponseDto> response = blockService.getBlockList(category, techPart, keyword, pageable);
-        return ResponseEntity.ok(response);
+        List<BlockResponseDto> blocks = blockService.findAll(blockType);
+        return ResponseEntity.ok(blocks);
     }
 }
