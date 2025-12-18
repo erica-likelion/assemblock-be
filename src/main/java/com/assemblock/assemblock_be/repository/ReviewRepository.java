@@ -2,7 +2,7 @@ package com.assemblock.assemblock_be.repository;
 
 import java.util.List;
 
-import com.assemblock.assemblock_be.entity.Review;
+import com.assemblock.assemblock_be.Entity.Review;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

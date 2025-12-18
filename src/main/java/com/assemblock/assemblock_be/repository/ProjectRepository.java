@@ -2,8 +2,8 @@ package com.assemblock.assemblock_be.repository;
 
 import java.util.List;
 
-import com.assemblock.assemblock_be.entity.Project;
-import com.assemblock.assemblock_be.entity.ProjectStatus;
+import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Entity.ProjectStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

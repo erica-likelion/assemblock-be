@@ -1,8 +1,8 @@
 package com.assemblock.assemblock_be.service;
 
-import com.assemblock.assemblock_be.entity.Project;
-import com.assemblock.assemblock_be.entity.ProjectMember;
-import com.assemblock.assemblock_be.entity.ProjectStatus;
+import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Entity.ProjectMember;
+import com.assemblock.assemblock_be.Entity.ProjectStatus;
 import com.assemblock.assemblock_be.repository.ProjectRepository;
 import com.assemblock.assemblock_be.repository.ProjectMemberRepository;
 

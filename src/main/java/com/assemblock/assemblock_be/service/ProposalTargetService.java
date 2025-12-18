@@ -1,8 +1,8 @@
 package com.assemblock.assemblock_be.service;
 
-import com.assemblock.assemblock_be.entity.ProposalTarget;
-import com.assemblock.assemblock_be.entity.ProposalTargetId;
-import com.assemblock.assemblock_be.entity.Status;
+import com.assemblock.assemblock_be.Entity.ProposalTarget;
+import com.assemblock.assemblock_be.Entity.ProposalTargetId;
+import com.assemblock.assemblock_be.Entity.Status;
 import com.assemblock.assemblock_be.repository.ProposalTargetRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

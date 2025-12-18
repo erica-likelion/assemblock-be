@@ -1,7 +1,7 @@
 package com.assemblock.assemblock_be.service;
 
-import com.assemblock.assemblock_be.entity.Proposal;
-import com.assemblock.assemblock_be.entity.User;
+import com.assemblock.assemblock_be.Entity.Proposal;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.repository.ProposalRepository;
 
 import lombok.RequiredArgsConstructor;

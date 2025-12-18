@@ -1,9 +1,9 @@
 package com.assemblock.assemblock_be.service;
 
-import com.assemblock.assemblock_be.entity.Review;
-import com.assemblock.assemblock_be.entity.ReviewStatus;
-import com.assemblock.assemblock_be.entity.Project;
-import com.assemblock.assemblock_be.entity.User;
+import com.assemblock.assemblock_be.Entity.Review;
+import com.assemblock.assemblock_be.Entity.ReviewStatus;
+import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.repository.ReviewRepository;
 import com.assemblock.assemblock_be.repository.ProjectRepository;
 

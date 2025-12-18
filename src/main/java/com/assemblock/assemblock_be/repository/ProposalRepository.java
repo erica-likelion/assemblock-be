@@ -2,7 +2,7 @@ package com.assemblock.assemblock_be.repository;
 
 import java.util.List;
 
-import com.assemblock.assemblock_be.entity.Proposal;
+import com.assemblock.assemblock_be.Entity.Proposal;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
