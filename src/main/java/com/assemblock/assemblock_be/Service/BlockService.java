@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +23,36 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public List<BlockResponseDto> findBlocks(
+            String blockTypeStr,
+            Block.BlockCategory category,
+            Block.TechPart techPart,
+            String keyword
+    ) {
+        Block.BlockType blockType = null;
+        if (StringUtils.hasText(blockTypeStr)) {
+            try {
+                blockType = Block.BlockType.valueOf(blockTypeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+
+        String finalKeyword = StringUtils.hasText(keyword) ? keyword : null;
+
+        List<Block> blocks = blockRepository.findBlocksDynamic(
+                blockType,
+                category,
+                techPart,
+                finalKeyword
+        );
+
+        return blocks.stream()
+                .map(BlockResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
 
     public List<BlockResponseDto> findAll(String blockTypeStr) {
         List<Block> blocks;
@@ -109,23 +138,6 @@ public class BlockService {
         }
 
         blockRepository.delete(block);
-    }
-
-    @Transactional(readOnly = true)
-    public List<BlockListResponseDto> getBlockList(
-            Optional<Block.BlockCategory> category,
-            Optional<Block.TechPart> techPart,
-            String keyword) {
-
-        String finalKeyword = (keyword != null && !keyword.isEmpty()) ? keyword : null;
-
-        List<Block> blocks = blockRepository.findBlocksDynamic(
-                category.orElse(null),
-                techPart.orElse(null),
-                finalKeyword
-        );
-
-        return blocks.stream().map(BlockListResponseDto::new).collect(Collectors.toList());
     }
 
     private void validateBlockTypeRequirements(BlockDto dto) {
