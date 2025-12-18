@@ -5,6 +5,7 @@ import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +30,15 @@ public class AuthController {
             @Valid @RequestBody SignupDto requestDto,
             @AuthenticationPrincipal User user
     ) {
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자가 아닙니다. 토큰을 확인해주세요.");
+        }
+
         Long currentUserId = user.getId();
         authService.completeProfile(currentUserId, requestDto);
         return ResponseEntity.ok("Profile setup complete.");
     }
 
-    // 토큰 재발급
     @PostMapping("/refresh")
     public ResponseEntity<TokenRefreshResponseDto> refreshAccessToken(
             @Valid @RequestBody TokenRefreshDto requestDto
