@@ -84,7 +84,6 @@ public class Block extends BaseTime {
         IDEA
     }
 
-    @Builder
     public Block(User user, BlockDto dto) {
         this.user = user;
         this.techPart = dto.getTechPart();

@@ -106,7 +106,6 @@ public class AuthService {
         params.add("client_id", kakaoRestApiKey);
         params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
-
         params.add("client_secret", clientSecret);
 
         try {

@@ -38,6 +38,8 @@ public class BlockDto {
 
     private String improvementPoint;
 
+    private String resultFileName;
+
     private String resultUrl;
 
     private String resultFile;
