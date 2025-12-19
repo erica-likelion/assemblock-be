@@ -1,22 +1,22 @@
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
-import com.assemblock.assemblock_be.Dto.BlockResponse;
-import com.assemblock.assemblock_be.Dto.BlockListResponse;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Repository.BlockRepository;
 import com.assemblock.assemblock_be.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,19 +24,85 @@ public class BlockService {
 
     private final BlockRepository blockRepository;
     private final UserRepository userRepository;
+    private final S3Service s3Service;
+
+    @Transactional(readOnly = true)
+    public List<BlockResponseDto> findBlocks(
+            String blockTypeStr,
+            Block.BlockCategory category,
+            Block.TechPart techPart,
+            String keyword
+    ) {
+        Block.BlockType blockType = null;
+        if (StringUtils.hasText(blockTypeStr)) {
+            try {
+                blockType = Block.BlockType.valueOf(blockTypeStr.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+
+        String finalKeyword = StringUtils.hasText(keyword) ? keyword : null;
+
+        List<Block> blocks = blockRepository.findBlocksDynamic(
+                blockType,
+                category,
+                techPart,
+                finalKeyword
+        );
+
+        return blocks.stream()
+                .map(BlockResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    public List<BlockResponseDto> findAll(String blockTypeStr) {
+        List<Block> blocks;
+
+        if (blockTypeStr != null && !blockTypeStr.isEmpty()) {
+            try {
+                Block.BlockType type = Block.BlockType.valueOf(blockTypeStr.toUpperCase());
+                blocks = blockRepository.findAllByBlockType(type);
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        } else {
+            blocks = blockRepository.findAll();
+        }
+
+        return blocks.stream()
+                .map(BlockResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
-    public Long createBlock(Long userId, BlockDto requestDto) {
+    public Long createBlock(Long userId, BlockDto requestDto, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (blockRepository.findByUserAndBlockTitle(user, requestDto.getBlockTitle()).isPresent()) {
-            throw new IllegalArgumentException("이미 동일한 제목의 블록이 존재합니다.");
+        validateBlockTypeRequirements(requestDto);
+
+        String fileUrl = null;
+        String originalFileName = null;
+
+        if (file != null && !file.isEmpty()) {
+            fileUrl = s3Service.uploadFile(file);
+            originalFileName = file.getOriginalFilename();
         }
 
         Block block = Block.builder()
                 .user(user)
-                .dto(requestDto)
+                .blockTitle(requestDto.getBlockTitle())
+                .categoryName(requestDto.getCategoryName())
+                .techPart(requestDto.getTechPart())
+                .blockType(requestDto.getBlockType())
+                .contributionScore(requestDto.getContributionScore())
+                .toolsText(requestDto.getToolsText())
+                .oneLineSummary(requestDto.getOneLineSummary())
+                .improvementPoint(requestDto.getImprovementPoint())
+                .resultUrl(requestDto.getResultUrl())
+                .resultFile(fileUrl)
+                .resultFileName(originalFileName)
                 .build();
 
         blockRepository.save(block);
@@ -45,15 +111,15 @@ public class BlockService {
     }
 
     @Transactional(readOnly = true)
-    public BlockResponse getBlockDetail(Long blockId) {
+    public BlockResponseDto getBlockDetail(Long blockId) {
         Block block = blockRepository.findById(blockId)
                 .orElseThrow(() -> new IllegalArgumentException("Block not found"));
 
-        return new BlockResponse(block);
+        return new BlockResponseDto(block);
     }
 
     @Transactional
-    public void updateBlock(Long userId, Long blockId, BlockDto requestDto) {
+    public void updateBlock(Long userId, Long blockId, BlockDto requestDto, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -64,13 +130,20 @@ public class BlockService {
             throw new AccessDeniedException("User does not have permission to update this block");
         }
 
-        if (!block.getBlockTitle().equals(requestDto.getBlockTitle())) {
-            if (blockRepository.findByUserAndBlockTitle(user, requestDto.getBlockTitle()).isPresent()) {
-                throw new IllegalArgumentException("이미 동일한 제목의 블록이 존재합니다.");
+        validateBlockTypeRequirements(requestDto);
+
+        String fileUrl = block.getResultFile();
+        String originalFileName = block.getResultFileName();
+
+        if (file != null && !file.isEmpty()) {
+            if (StringUtils.hasText(fileUrl)) {
+                s3Service.deleteFile(fileUrl);
             }
+            fileUrl = s3Service.uploadFile(file);
+            originalFileName = file.getOriginalFilename();
         }
 
-        block.update(requestDto);
+        block.update(requestDto, fileUrl, originalFileName);
     }
 
     @Transactional
@@ -85,33 +158,21 @@ public class BlockService {
             throw new AccessDeniedException("User does not have permission to delete this block");
         }
 
+        if (StringUtils.hasText(block.getResultFile())) {
+            s3Service.deleteFile(block.getResultFile());
+        }
+
         blockRepository.delete(block);
     }
 
-    @Transactional(readOnly = true)
-    public BlockPagingResponse<BlockListResponse> getBlockList(
-            Optional<Block.BlockCategory> category,
-            Optional<Block.TechPart> techPart,
-            String keyword,
-            Pageable pageable) {
-
-        Page<Block> blockPage;
-
-        boolean hasKeyword = keyword != null && !keyword.isEmpty();
-
-        if (category.isPresent() && techPart.isPresent() && hasKeyword) {
-            blockPage = blockRepository.findAllByCategoryNameAndTechPartAndBlockTitleContaining(
-                    category.get(),
-                    techPart.get(),
-                    keyword,
-                    pageable);
-        } else {
-            String finalKeyword = hasKeyword ? keyword : "";
-            blockPage = blockRepository.findAllByBlockTitleContaining(finalKeyword, pageable);
+    private void validateBlockTypeRequirements(BlockDto dto) {
+        if (dto.getBlockType() == Block.BlockType.TECHNOLOGY) {
+            if (dto.getTechPart() == null) {
+                throw new IllegalArgumentException("TECHNOLOGY 타입은 기술 파트(techPart)가 필수입니다.");
+            }
+            if (!StringUtils.hasText(dto.getToolsText())) {
+                throw new IllegalArgumentException("TECHNOLOGY 타입은 툴 설명(toolsText)이 필수입니다.");
+            }
         }
-
-        Page<BlockListResponse> dtoPage = blockPage.map(BlockListResponse::new);
-
-        return new BlockPagingResponse<>(dtoPage);
     }
 }

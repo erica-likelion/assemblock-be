@@ -1,6 +1,5 @@
 package com.assemblock.assemblock_be.Entity;
 
-import com.assemblock.assemblock_be.ProposalTarget;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,9 +11,10 @@ import java.util.ArrayList;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor()
 @AllArgsConstructor
 @Builder
+@ToString
 @Table(name = "Proposal")
 public class Proposal {
     @Id
@@ -23,8 +23,8 @@ public class Proposal {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposer_id", nullable = false)
-    private User proposer;
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    private User user;
 
     @Column(name = "discord_id", nullable = false)
     private String discordId;

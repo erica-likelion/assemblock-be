@@ -1,13 +1,8 @@
 package com.assemblock.assemblock_be.Service;
 
-import com.assemblock.assemblock_be.Dto.BlockResponseDto;
-import com.assemblock.assemblock_be.Dto.MyProfileResponseDto;
-import com.assemblock.assemblock_be.Dto.ReviewResponseDto;
+import com.assemblock.assemblock_be.Dto.*;
 import com.assemblock.assemblock_be.Entity.*;
-import com.assemblock.assemblock_be.Repository.BlockRepository;
-import com.assemblock.assemblock_be.Repository.ProjectMemberRepository;
-import com.assemblock.assemblock_be.Repository.ReviewRepository;
-import com.assemblock.assemblock_be.Repository.UserRepository;
+import com.assemblock.assemblock_be.Repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +34,7 @@ public class ProfileService {
             blocks = blockRepository.findAllByUser(user);
         } else {
             try {
-                BlockType blockType = BlockType.valueOf(type.toUpperCase());
+                Block.BlockType blockType = Block.BlockType.valueOf(type.toUpperCase());
                 blocks = blockRepository.findAllByUserAndBlockType(user, blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);

@@ -1,11 +1,5 @@
 package com.assemblock.assemblock_be.Entity;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
 import com.assemblock.assemblock_be.Dto.SignupDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,12 +8,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "User")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends BaseTimeEntity implements UserDetails {
+public class User extends BaseTime implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +25,7 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private Long kakaoId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String nickname;
 
     @Column(name = "introduction")
@@ -44,6 +40,9 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "profile_type")
     private UserProfileType profileType;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -79,37 +78,50 @@ public class User extends BaseTimeEntity implements UserDetails {
     private List<Board> boards = new ArrayList<>();
 
     @Builder
-    public User(Long kakaoId) {
+    public User(Long kakaoId, String nickname) {
         this.kakaoId = kakaoId;
+        this.nickname = nickname;
         this.isProfileComplete = false;
+        this.profileType = UserProfileType.TYPE_1;
         this.reviewSentCnt = 0;
         this.reviewReceivedCnt = 0;
         this.reliabilityLevel = new BigDecimal("0.0");
         this.isPublishing = true;
     }
 
-    /**
-     * 2단계 회원가입
-     */
     public void completeProfile(SignupDto dto) {
         this.nickname = dto.getNickname();
         this.roles = new ArrayList<>(dto.getRoles());
-
-        this.profileType = UserProfileType.values()[dto.getProfileImageIndex() - 1];
-
+        this.profileType = dto.getUserProfileType();
         this.introduction = dto.getIntroduction();
         this.portfolioUrl = dto.getPortfolioUrl();
         this.portfolioPdfUrl = dto.getPortfolioPdfUrl();
-
         this.isProfileComplete = true;
     }
-    
+
+    public void updateProfile(String nickname, String portfolioUrl, String introduction,
+                              List<Role> roles, UserProfileType profileType, String portfolioPdfUrl) {
+        this.nickname = nickname;
+        this.portfolioUrl = portfolioUrl;
+        this.introduction = introduction;
+        if (roles != null) {
+            this.roles = new ArrayList<>(roles);
+        }
+        this.profileType = profileType;
+        this.portfolioPdfUrl = portfolioPdfUrl;
+    }
+
     public void increaseReviewSentCnt() {
         this.reviewSentCnt++;
     }
 
     public void increaseReviewReceivedCnt() {
         this.reviewReceivedCnt++;
+    }
+
+    // [수정 3] Refresh Token 업데이트 메서드 구현
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     @Override
@@ -147,36 +159,5 @@ public class User extends BaseTimeEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    @Converter
-    public static class MemberRoleSetConverter implements AttributeConverter<Set<MemberRole>, String> {
-        @Override
-        public String convertToDatabaseColumn(Set<MemberRole> attribute) {
-            if (attribute == null || attribute.isEmpty()) {
-                return "";
-            }
-            return attribute.stream()
-                    .map(MemberRole::name)
-                    .collect(Collectors.joining(","));
-        }
-
-        @Override
-        public Set<MemberRole> convertToEntityAttribute(String dbData) {
-            if (dbData == null || dbData.isBlank()) {
-                return new HashSet<>();
-            }
-            return Arrays.stream(dbData.split(","))
-                    .map(MemberRole::valueOf)
-                    .collect(Collectors.toSet());
-        }
-    }
-
-    public void increaseReviewSentCnt() {
-        this.reviewSentCnt++;
-    }
-
-    public void increaseReviewReceivedCnt() {
-        this.reviewReceivedCnt++;
     }
 }

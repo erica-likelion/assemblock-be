@@ -33,17 +33,6 @@ public class BoardDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class BoardSummaryResponse {
-        private Long boardId;
-        private String boardName;
-        private int blockCount;
-        private List<String> previewTypes;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class BoardDetailResponse {
         private Long boardId;
         private String boardName;
@@ -71,4 +60,3 @@ public class BoardDto {
         private List<Long> targetBlockIds;
     }
 }
-

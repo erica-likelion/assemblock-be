@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -22,7 +21,7 @@ public class ProjectMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", nullable = false, unique = true, updatable = false)
-    private Long memberId;
+    private Long Id;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,8 +47,7 @@ public class ProjectMember {
 
     @Column(name = "is_proposer", nullable = false)
     private Boolean isProposer = false;
-    
-    @Builder
+
     public ProjectMember(Project project, User user, Proposal proposal, User proposer, MemberRole memberRole, Boolean isProposer) {
         this.project = project;
         this.user = user;

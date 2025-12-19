@@ -1,18 +1,15 @@
 package com.assemblock.assemblock_be.Dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import com.assemblock.assemblock_be.Entity.ProposalStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class ProposalTargetUpdateRequestDto {
-
-    private String status;  // accepted / rejected / pending
+    private ProposalStatus responseStatus;
 }
-

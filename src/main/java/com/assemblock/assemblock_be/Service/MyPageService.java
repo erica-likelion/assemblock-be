@@ -1,5 +1,3 @@
-// S3 설정 후 수정
-
 package com.assemblock.assemblock_be.Service;
 
 import com.assemblock.assemblock_be.Dto.BlockResponseDto;
@@ -19,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,16 +28,11 @@ public class MyPageService {
     private final BlockRepository blockRepository;
     private final ReviewRepository reviewRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    // private final S3Service s3Service;
-
-    public MyProfileResponseDto getMyProfile(Long currentUserId) {
-        User user = findUserById(currentUserId);
-        return MyProfileResponseDto.fromEntity(user);
-    }
 
     @Transactional
     public MyProfileResponseDto updateMyProfile(Long currentUserId, ProfileUpdateRequestDto requestDto) {
         User user = findUserById(currentUserId);
+
         user.updateProfile(
                 requestDto.getNickname(),
                 requestDto.getPortfolioUrl(),
@@ -51,18 +45,14 @@ public class MyPageService {
     }
 
     @Transactional
-    public String uploadFile(Long currentUserId, MultipartFile file) {
-        User user = findUserById(currentUserId);
-
+    public String uploadFile(Long userId, MultipartFile file) {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어있습니다.");
         }
 
-        // 임시 URL
-        String fileName = file.getOriginalFilename();
-        String mockUrl = "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
+        String fileName = "user_" + userId + "_" + UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
-        return mockUrl;
+        return "https://s3.amazonaws.com/assemblock-bucket/" + fileName;
     }
 
     public List<BlockResponseDto> getMyBlocks(Long currentUserId, String type) {
@@ -73,7 +63,7 @@ public class MyPageService {
             blocks = blockRepository.findAllByUser(user);
         } else {
             try {
-                BlockType blockType = BlockType.valueOf(type.toUpperCase());
+                Block.BlockType blockType = Block.BlockType.valueOf(type.toUpperCase());
                 blocks = blockRepository.findAllByUserAndBlockType(user, blockType);
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("유효하지 않은 블록 타입입니다: " + type);
@@ -100,6 +90,7 @@ public class MyPageService {
         return reviewsToProcess.stream()
                 .map(review -> {
                     Project project = review.getProject();
+
                     User targetUser = "SCOUTING".equalsIgnoreCase(type) ? review.getReviewedUser() : review.getUser();
 
                     Optional<ProjectMember> roleOpt = projectMemberRepository.findByProjectAndUser(project, targetUser);

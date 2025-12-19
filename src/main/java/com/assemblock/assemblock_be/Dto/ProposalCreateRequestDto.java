@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,10 +16,10 @@ import java.time.LocalDate;
 @Builder
 public class ProposalCreateRequestDto {
 
-    private Long proposerId;          // 제안자 user_id
-    private String discordId;         // 디스코드 아이디
-    private LocalDate recruitStartDate;   // 모집 시작일
-    private LocalDate recruitEndDate;     // 모집 종료일
-    private String projectTitle;      // 프로젝트 이름
-    private String projectMemo;       // 프로젝트 설명
+    private String discordId;
+    private LocalDate recruitStartDate;
+    private LocalDate recruitEndDate;
+    private String projectTitle;
+    private String projectMemo;
+    private Long boardId;
 }

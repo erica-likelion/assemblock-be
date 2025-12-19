@@ -1,8 +1,11 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Entity.Project;
+import com.assemblock.assemblock_be.Dto.ProjectDetailResponseDto;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,28 +17,39 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    // 1) 내가 만든 프로젝트 목록
-    @GetMapping("/mine/{userId}")
-    public List<Project> getMyProjects(@PathVariable Long userId) {
-        return projectService.getMyProjects(userId);
-    }
-
-    @GetMapping("/ongoing")
-    public List<Project> getOngoingProjects(@RequestParam Long userId) {
-        return projectService.getOngoingProjects(userId);
-    }
-
-    @PatchMapping("/{projectId}/complete")
-    public void completeProject(
-            @PathVariable Long projectId,
-            @RequestParam Long userId
+     // 단일 프로젝트 상세 조회
+    @GetMapping("/{projectId}")
+    public ResponseEntity<ProjectDetailResponseDto> getProjectDetail(
+            @PathVariable Long projectId
     ) {
-        projectService.completeProject(projectId, userId);
+        ProjectDetailResponseDto response = projectService.getProjectDetail(projectId);
+        return ResponseEntity.ok(response);
     }
 
-    // 4) 완료된 프로젝트 목록
-    @GetMapping("/completed/{userId}")
-    public List<Project> getCompletedProjects(@PathVariable Long userId) {
-        return projectService.getCompletedProjects(userId);
+    // 진행 중인 프로젝트 목록 조회 (팀원 리스트 포함)
+    @GetMapping("/ongoing")
+    public ResponseEntity<List<ProjectDetailResponseDto>> getOngoingProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        List<ProjectDetailResponseDto> response = projectService.getMyOngoingProjects(user.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    // 프로젝트 완료 처리 (팀장만 가능)
+    @PatchMapping("/{projectId}/complete")
+    public ResponseEntity<Void> completeProject(
+            @PathVariable Long projectId,
+            @AuthenticationPrincipal User user
+    ) {
+        projectService.completeProject(projectId, user.getId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/complete")
+    public ResponseEntity<List<ProjectDetailResponseDto>> getCompletedProjects(
+            @AuthenticationPrincipal User user
+    ) {
+        List<ProjectDetailResponseDto> response = projectService.getMyCompletedProjects(user.getId());
+        return ResponseEntity.ok(response);
     }
 }

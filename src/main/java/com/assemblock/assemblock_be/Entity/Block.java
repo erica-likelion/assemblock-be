@@ -6,12 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Check;
-import org.hibernate.annotations.CreationTimestamp;
 import com.assemblock.assemblock_be.Dto.BlockDto;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -19,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "Block")
-public class Block extends BaseTimeEntity {
+public class Block extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +22,7 @@ public class Block extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id",  nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -45,17 +40,29 @@ public class Block extends BaseTimeEntity {
     @Column(name = "block_type", nullable = false)
     private BlockType blockType;
 
-    @Check(constraints = "contribution_score >= 0 AND contribution_score <= 10")
+    @Check(constraints = "contribution_score >= 0 AND contribution_score <= 100")
     @Column(name = "contribution_score", nullable = false)
     private @NotNull(message = "기여도는 필수입니다.")
     @Min(0)
-    @Max(10) Integer contributionScore;
+    @Max(100) Integer contributionScore;
 
     @Column(name = "tools_text", columnDefinition = "TEXT")
     private String toolsText;
 
     @Column(name = "oneline_summary", columnDefinition = "TEXT", nullable = false)
     private String oneLineSummary;
+
+    @Column(name = "improvement_point", columnDefinition = "TEXT")
+    private String improvementPoint;
+
+    @Column(name = "result_url")
+    private String resultUrl;
+
+    @Column(name = "result_file", length = 2048)
+    private String resultFile;
+
+    @Column(name = "result_file_name")
+    private String resultFileName;
 
 
     public enum BlockCategory {
@@ -87,10 +94,12 @@ public class Block extends BaseTimeEntity {
         this.contributionScore = dto.getContributionScore();
         this.toolsText = dto.getToolsText();
         this.oneLineSummary = dto.getOneLineSummary();
+        this.improvementPoint = dto.getImprovementPoint();
+        this.resultUrl = dto.getResultUrl();
+        this.resultFile = dto.getResultFile();
     }
 
-    // --- ▽ 수정 메서드 (Update) ▽ ---
-    public void update(BlockDto dto) {
+    public void update(BlockDto dto, String resultFile, String resultFileName) {
         this.techPart = dto.getTechPart();
         this.categoryName = dto.getCategoryName();
         this.blockTitle = dto.getBlockTitle();
@@ -98,5 +107,9 @@ public class Block extends BaseTimeEntity {
         this.contributionScore = dto.getContributionScore();
         this.toolsText = dto.getToolsText();
         this.oneLineSummary = dto.getOneLineSummary();
+        this.improvementPoint = dto.getImprovementPoint();
+        this.resultUrl = dto.getResultUrl();
+        this.resultFile = resultFile;
+        this.resultFileName = resultFileName;
     }
 }

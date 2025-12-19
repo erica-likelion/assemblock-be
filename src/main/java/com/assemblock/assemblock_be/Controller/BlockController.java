@@ -1,22 +1,21 @@
 package com.assemblock.assemblock_be.Controller;
 
 import com.assemblock.assemblock_be.Dto.BlockDto;
-import com.assemblock.assemblock_be.Dto.BlockResponse;
-import com.assemblock.assemblock_be.Dto.BlockPagingResponse;
-import com.assemblock.assemblock_be.Dto.BlockListResponse;
+import com.assemblock.assemblock_be.Dto.BlockResponseDto;
 import com.assemblock.assemblock_be.Entity.Block;
 import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.BlockService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.Optional;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/blocks")
@@ -25,46 +24,36 @@ public class BlockController {
 
     private final BlockService blockService;
 
-    /**
-     * 1. 블록 생성 (POST)
-     */
-    @PostMapping
-    public ResponseEntity<Void> createBlock(
-            @Valid @RequestBody BlockDto requestDto,
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<BlockResponseDto> createBlock(
+            @RequestPart(value = "dto") @Valid BlockDto requestDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
-    ) {
-        Long blockId = blockService.createBlock(user.getId(), requestDto);
-
-        return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).build();
+    ) throws IOException {
+        Long blockId = blockService.createBlock(user.getId(), requestDto, file);
+        BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
+        return ResponseEntity.created(URI.create("/api/blocks/" + blockId)).body(responseDto);
     }
 
-    /**
-     * 2. 블록 상세 조회 (GET)
-     */
     @GetMapping("/{blockId}")
-    public ResponseEntity<BlockResponse> getBlockDetail(
-                                                         @PathVariable Long blockId
+    public ResponseEntity<BlockResponseDto> getBlockDetail(
+            @PathVariable Long blockId
     ) {
-        BlockResponse responseDto = blockService.getBlockDetail(blockId);
+        BlockResponseDto responseDto = blockService.getBlockDetail(blockId);
         return ResponseEntity.ok(responseDto);
     }
 
-    /**
-     * 3. 블록 수정 (PUT)
-     */
-    @PutMapping("/{blockId}")
+    @PutMapping(value = "/{blockId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Void> updateBlock(
             @PathVariable Long blockId,
-            @Valid @RequestBody BlockDto requestDto,
+            @RequestPart(value = "dto") @Valid BlockDto requestDto,
+            @RequestPart(value = "file", required = false) MultipartFile file,
             @AuthenticationPrincipal User user
-    ) {
-        blockService.updateBlock(user.getId(), blockId, requestDto);
+    ) throws IOException {
+        blockService.updateBlock(user.getId(), blockId, requestDto, file);
         return ResponseEntity.ok().build();
     }
 
-    /**
-     * 4. 블록 삭제 (DELETE)
-     */
     @DeleteMapping("/{blockId}")
     public ResponseEntity<Void> deleteBlock(
             @PathVariable Long blockId,
@@ -74,17 +63,14 @@ public class BlockController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * 5. 블록 목록 조회/검색 (GET) - 신규
-     */
     @GetMapping
-    public ResponseEntity<BlockPagingResponse<BlockListResponse>> getBlockList(
-            @RequestParam(required = false) Optional<Block.BlockCategory> category,
-            @RequestParam(required = false) Optional<Block.TechPart> techPart,
-            @RequestParam(required = false) String keyword,
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable
+    public ResponseEntity<List<BlockResponseDto>> findBlocks(
+            @RequestParam(required = false) String blockType,
+            @RequestParam(required = false) Block.BlockCategory category,
+            @RequestParam(required = false) Block.TechPart techPart,
+            @RequestParam(required = false) String keyword
     ) {
-        BlockPagingResponse<BlockListResponse> response = blockService.getBlockList(category, techPart, keyword, pageable);
+        List<BlockResponseDto> response = blockService.findBlocks(blockType, category, techPart, keyword);
         return ResponseEntity.ok(response);
     }
 }

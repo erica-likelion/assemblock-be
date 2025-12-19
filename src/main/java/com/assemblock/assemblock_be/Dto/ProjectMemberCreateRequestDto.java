@@ -12,9 +12,8 @@ import lombok.Builder;
 @AllArgsConstructor
 @Builder
 public class ProjectMemberCreateRequestDto {
-
-    private Long projectId;   // 참여할 프로젝트 id
-    private Long userId;      // 팀원으로 추가할 유저 id
-    private String memberRole; // Plan / Design / PM / FrontEnd / BackEnd
-    private boolean isProposer; // 제안자인지 여부
+    private Long projectId;
+    private Long userId;
+    private String memberRole;
+    private boolean isProposer;
 }

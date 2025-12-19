@@ -1,56 +1,63 @@
 package com.assemblock.assemblock_be.Controller;
 
-import com.assemblock.assemblock_be.Entity.Proposal;
+import com.assemblock.assemblock_be.Dto.ProposalCreateRequestDto;
+import com.assemblock.assemblock_be.Dto.ProposalResponseDto;
+import com.assemblock.assemblock_be.Dto.ProposalListDto;
+import com.assemblock.assemblock_be.Dto.ProposalTargetUpdateRequestDto;
+//import com.assemblock.assemblock_be.Entity.Proposal;
+import com.assemblock.assemblock_be.Entity.User;
 import com.assemblock.assemblock_be.Service.ProposalService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/proposals")
 public class ProposalController {
+
     private final ProposalService proposalService;
 
     @PostMapping
-    public Proposal sendProposal(@RequestBody ProposalRequestDto request) {
-        return proposalService.sendProposal(
-                request.getProposerId(),
-                request.getDiscordId(),
-                LocalDate.parse(request.getStartDate()),
-                LocalDate.parse(request.getEndDate()),
-                request.getTitle(),
-                request.getMemo()
-        );
+    public ResponseEntity<ProposalResponseDto> createProposal(
+            @AuthenticationPrincipal User user,
+            @RequestBody ProposalCreateRequestDto requestDto
+    ) {
+        ProposalResponseDto response = proposalService.createProposal(user.getId(), requestDto);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{id}")
-    public Proposal findProposal(@PathVariable Long id) {
-        return proposalService.findById(id);
+    @GetMapping("/me")
+    public ResponseEntity<List<ProposalListDto>> getMyProposals(
+            @AuthenticationPrincipal User user
+    ) {
+        List<ProposalListDto> proposals = proposalService.getMyProposals(user.getId());
+        return ResponseEntity.ok(proposals);
     }
 
-    // 3) 전체 제안 조회
-    @GetMapping
-    public List<Proposal> findAll() {
-        return proposalService.findAll();
+    @GetMapping("/{proposalId}")
+    public ResponseEntity<ProposalResponseDto> getProposal(@PathVariable Long proposalId) {
+        ProposalResponseDto response = proposalService.getProposalDetail(proposalId);
+        return ResponseEntity.ok(response);
     }
 
-    // 4) 삭제
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        proposalService.delete(id);
+    @DeleteMapping("/{proposalId}")
+    public ResponseEntity<Void> delete(@PathVariable Long proposalId) {
+        proposalService.delete(proposalId);
+        return ResponseEntity.ok().build();
     }
 
-    @Data
-    public static class ProposalRequestDto {
-        private Long proposerId;
-        private String discordId;
-        private String startDate;
-        private String endDate;
-        private String title;
-        private String memo;
+    @PatchMapping("/{proposalId}/response")
+    public ResponseEntity<ProposalResponseDto> respondToProposal(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long proposalId,
+            @RequestBody ProposalTargetUpdateRequestDto request
+    ) {
+        ProposalResponseDto response = proposalService.respondToProposal(user.getId(), proposalId, request);
+
+        return ResponseEntity.ok(response);
     }
 }
