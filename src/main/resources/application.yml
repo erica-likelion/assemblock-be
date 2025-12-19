@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://assemblock.cf8wcw6w2dp0.ap-southeast-2.rds.amazonaws.com:3306/assemblock_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: kukchaewon
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    password: ${SPRING_DATASOURCE_PASSWORD} //6jdye43ngfi
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
