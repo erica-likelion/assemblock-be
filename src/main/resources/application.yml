@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://assemblock.cf8wcw6w2dp0.ap-southeast-2.rds.amazonaws.com:3306/assemblock_db?serverTimezone=UTC&characterEncoding=UTF-8
     username: kukchaewon
-    password: { password }
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -29,16 +29,17 @@ cloud:
     region:
       static: ap-southeast-2
     credentials:
-      access-key: { ACCESS_KEY }
-      secret-key: { SECRET_KEY }
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
     stack:
       auto: false
 
 kakao:
   rest-api-key: ${KAKAO_CLIENT_ID}
   redirect-uri: ${KAKAO_REDIRECT_URI}
+  client-secret: ${KAKAO_CLIENT_SECRET}
 
 jwt:
-  secret-key: ${KAKAO_CLIENT_SECRET}
+  secret-key: ${JWT_SECRET_KEY}
   access-token-expiration-ms: 1800000
   refresh-token-expiration-ms: 604800000
