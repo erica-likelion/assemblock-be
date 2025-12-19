@@ -35,9 +35,6 @@ public class AuthService {
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
-    @Value("${kakao.client-secret}")
-    private String clientSecret;
-
     @Transactional
     public AuthResponseDto kakaoLogin(String authorizationCode) {
         String kakaoAccessToken = getKakaoAccessToken(authorizationCode);
@@ -106,8 +103,6 @@ public class AuthService {
         params.add("client_id", kakaoRestApiKey);
         params.add("redirect_uri", kakaoRedirectUri);
         params.add("code", code);
-
-        params.add("client_secret", clientSecret);
 
         try {
             Map response = webClient.post()
