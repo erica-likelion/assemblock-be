@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  assemblock-server:
+    image: gugc29311/assemblock-server:latest
+    container_name: assemblock-server
+    ports:
+      - "9090:9090"
+    environment:
+      CLOUD_AWS_CREDENTIALS_ACCESS_KEY: ${AWS_ACCESS_KEY}
+      CLOUD_AWS_CREDENTIALS_SECRET_KEY: ${AWS_SECRET_KEY}
+      CLOUD_AWS_REGION_STATIC: "ap-southeast-2"
+      KAKAO_CLIENT_ID: ${KAKAO_ID}
+      KAKAO_REDIRECT_URI: ${REDIRECT_URL}
+      KAKAO_CLIENT_SECRET: ${JWT_SECRET}
+    restart: always
